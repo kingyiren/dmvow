@@ -23,10 +23,10 @@ package ru.dmvow.model.pmml.models.associationModel
 	 */
 	public class AssociationRule extends Extendable
 	{
-		/** Required. Id of some ItemSet object. */
-		public var antecedent:String;
-		/** Required. Id of some ItemSet object. */
-		public var consequent:String;
+		/** Required. Some Itemset object. */
+		public var antecedent:Itemset;
+		/** Required. Some Itemset object. */
+		public var consequent:Itemset;
 		/** Required. In [0, 1]. */
 		public var support:Number;
 		/** Required. In [0, 1]. */

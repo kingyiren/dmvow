@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical" 
+	title="PMML Global properties"
+	>
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.model.pmml.PMML;
+			
+			protected var _pmml:PMML = null;
+			
+			[Bindable]
+			public function get pmml():PMML
+			{
+				return _pmml;
+			}
+			
+			public function set pmml(value:PMML):void
+			{
+				_pmml = value;
+			}
+		]]>
+	</mx:Script>
+	<mx:Form width="100%" height="100%">
+		<mx:FormItem label="version">
+			<mx:Label text="{pmml.version}"/>
+		</mx:FormItem>
+		<mx:FormItem label="copyright">
+			<mx:Label text="{pmml.header.copyright}"/>
+		</mx:FormItem>
+		<mx:FormItem label="description" width="100%" height="100%">
+			<mx:TextArea width="100%" borderThickness="0" text="{pmml.header.description}"/>
+		</mx:FormItem>
+	</mx:Form>
+	
+</mx:Panel>
