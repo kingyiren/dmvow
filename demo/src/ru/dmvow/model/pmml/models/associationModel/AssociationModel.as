@@ -1,9 +1,6 @@
 package ru.dmvow.model.pmml.models.associationModel
 {
 	import ru.dmvow.model.pmml.models.MiningModel;
-	import ru.dmvow.model.pmml.models.common.LocalTransformations;
-	import ru.dmvow.model.pmml.models.common.MiningSchema;
-	import ru.dmvow.model.pmml.models.common.ModelStats;
 	
 	/**
 	 * <p>The XSD Schema for this node:</p>
@@ -102,6 +99,7 @@ package ru.dmvow.model.pmml.models.associationModel
 		public var minimumSupport:Number;
 		/** Required. */
 		public var minimumConfidence:Number;
+		/** Optional. */
 		public var lengthLimit:int;
 		/** Required. */
 		public var numberOfItems:int;
@@ -117,10 +115,46 @@ package ru.dmvow.model.pmml.models.associationModel
 		/**
 		 * Array of ItemSet objects. Can be empty.
 		 */
-		public var itemSets:Array = new Array();
+		public var itemsets:Array = new Array();
 		/**
 		 * Array of AssociationRule objects. Can be empty.
 		 */
 		public var associationRules:Array = new Array();
+		
+		public function getItemById(id:String):Item
+		{
+			for (var i:Number = 0; i < items.length; i++)
+			{
+				var item:Item = (items[i] as Item);
+				if (item.id == id)
+					return item;
+			}
+			
+			return null;
+		}
+		
+		public function getItemsetById(id:String):Itemset
+		{
+			for (var i:Number = 0; i < itemsets.length; i++)
+			{
+				var itemset:Itemset = (itemsets[i] as Itemset);
+				if (itemset.id == id)
+					return itemset;
+			}
+			
+			return null;
+		}
+		
+		public function getAssociationRuleById(id:String):AssociationRule
+		{
+			for (var i:Number = 0; i < associationRules.length; i++)
+			{
+				var rule:AssociationRule = (associationRules[i] as AssociationRule);
+				if (rule.id == id)
+					return rule;
+			}
+			
+			return null;
+		}
 	}
 }

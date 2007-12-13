@@ -22,9 +22,10 @@ package ru.dmvow.model.pmml.models.associationModel
 	public class Itemset extends Extendable
 	{
 		/**
-		 * Array of ItemRef objects. Can be empty.
+		 * Array of Item objects. Can be empty. We parse ItemRef objects
+		 * directly to the Item objects to simplify the navigation. 
 		 */
-		public var itemRefs:Array = new Array();
+		public var items:Array = new Array();
 		/**
 		 * Required.
 		 */
