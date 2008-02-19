@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.dataDictionary
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -35,10 +37,10 @@ package ru.dmvow.model.pmml.dataDictionary
 		/**
 		 * Array of DataField objects. Must be not empty.
 		 */
-		public var dataFields:Array = new Array();
+		public var dataFields:ArrayCollection = new ArrayCollection();
 		/**
 		 * Array of Taxonomy objects.
 		 */
-		public var taxonomies:Array = new Array();
+		public var taxonomies:ArrayCollection = new ArrayCollection();
 	}
 }

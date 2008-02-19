@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.dataDictionary
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -49,6 +51,6 @@ package ru.dmvow.model.pmml.dataDictionary
 		/**
 		 * Choise between Array of Interval and Array of Value.
 		 */
-		public var choise:Array;
+		public var choise:ArrayCollection;
 	}
 }

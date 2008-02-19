@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%"
+	creationComplete="onCreationComplete(event)"
+	backgroundColor="0xEEEEEE"
+	paddingBottom="5"
+	paddingLeft="5"
+	paddingRight="5"
+	paddingTop="5"
+	>
+	<mx:Script>
+		<![CDATA[
+			import com.dynamicflash.util.Base64;
+			import ru.dmvow.model.Params;
+			import ru.dmvow.events.sidePanels.SidePanelsEvent;
+			import ru.dmvow.control.boundary.dataModelParser.DataModelParser;
+			public static const COMMON_STATE:String = "";
+			public static const BROWSE_STATE:String = "browse_state";
+			public static const LOADING_STATE:String = "loading_state";
+			public static const ERROR_STATE:String = "error_state";
+			public static const PROCESSING_STATE:String = "processing_state";
+			
+			protected var fileReference:FileReference;
+			protected var parser:DataModelParser;
+			
+			public function show():void
+			{
+				currentState = BROWSE_STATE;
+			}
+			
+			protected function onCreationComplete(event:Event):void
+			{
+				fileReference = new FileReference();
+				fileReference.addEventListener(Event.SELECT, fileSelect);
+				fileReference.addEventListener(Event.OPEN, uploadOpen);
+				fileReference.addEventListener(ProgressEvent.PROGRESS, uploadProgress);
+				fileReference.addEventListener(IOErrorEvent.IO_ERROR, uploadError);
+				fileReference.addEventListener(SecurityErrorEvent.SECURITY_ERROR, uploadError);
+				fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, uploadComplete);
+				
+				parser = new DataModelParser();
+				parser.addEventListener(Event.COMPLETE, onParserComplete);
+				parser.addEventListener(ProgressEvent.PROGRESS, onParserProgress);
+				parser.addEventListener(ErrorEvent.ERROR, onParserError);
+			}
+			
+			protected function onBrowseButtonClick(event:Event):void
+			{
+				fileReference.browse();
+			}
+			
+			protected function fileSelect(event:Event):void
+			{
+				// TODO: сделать логику загрузки на сервер
+				var urlRequest:URLRequest = new URLRequest(Params.FILE_UPLOAD_URL);
+				fileReference.upload(urlRequest);
+			}
+			
+			protected function uploadOpen(event:Event):void
+			{
+				currentState = LOADING_STATE;
+				
+				loadingProgressBar.indeterminate = false;
+			}
+			
+			protected function uploadProgress(event:ProgressEvent):void
+			{
+				if (currentState == LOADING_STATE)
+				{
+					loadingProgressBar.setProgress(event.bytesLoaded/event.bytesTotal, 1);
+					
+					if (event.bytesLoaded == event.bytesTotal)
+					{
+						loadingProgressBar.indeterminate = true;
+					}
+				}
+			}
+			
+			protected function uploadError(event:Event):void
+			{
+				currentState = ERROR_STATE;
+				errorLabel.text = "Ошибка: " + event.toString();
+			}
+			
+			protected function uploadComplete(event:Event):void
+			{
+				var dataEvent:DataEvent = DataEvent(event);
+				currentState = PROCESSING_STATE;
+				
+				//var data:String = Base64.decode(dataEvent.data);
+				parser.parse(dataEvent.data);
+			}
+			
+			protected function onParserComplete(event:Event):void
+			{
+				currentState = COMMON_STATE;
+				
+				var newEvent:SidePanelsEvent = 
+					new SidePanelsEvent(SidePanelsEvent.ADD_MODEL);
+				newEvent.data = parser.result;
+				newEvent.dispatch();
+			}
+			
+			protected function onParserProgress(event:ProgressEvent):void
+			{
+				if (currentState == PROCESSING_STATE)
+				{
+					processingProgressBar.setProgress(event.bytesLoaded/event.bytesTotal, 1);
+				}
+			}
+			
+			protected function onParserError(event:Event):void
+			{
+				currentState = ERROR_STATE;
+			}
+		]]>
+	</mx:Script>
+	<mx:states>
+		<mx:State name="{BROWSE_STATE}">
+			<mx:AddChild>
+				<mx:Label text="From local file:"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:Button id="browseButton" label="Обзор" click="onBrowseButtonClick(event)"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{LOADING_STATE}">
+			<mx:AddChild>
+				<mx:ProgressBar label="Loading" id="loadingProgressBar" mode="manual" minimum="0" maximum="1" width="100%"/> 
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{ERROR_STATE}">
+			<mx:AddChild>
+				<mx:Label id="errorLabel" text="Error!"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{PROCESSING_STATE}">
+			<mx:AddChild>
+				<mx:ProgressBar label="Processing" id="processingProgressBar" mode="manual" minimum="0" maximum="1" width="100%"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+</mx:HBox>

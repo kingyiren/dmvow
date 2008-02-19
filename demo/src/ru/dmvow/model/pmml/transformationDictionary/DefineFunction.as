@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.transformationDictionary
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -34,7 +36,7 @@ package ru.dmvow.model.pmml.transformationDictionary
 		/**
 		 * Array of ParameterField objects. Must be not empty.
 		 */
-		public var parameterFields:Array = new Array();
+		public var parameterFields:ArrayCollection = new ArrayCollection();
 		
 	}
 }

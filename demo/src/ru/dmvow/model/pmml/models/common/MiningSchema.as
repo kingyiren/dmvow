@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.models.common
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -21,6 +23,6 @@ package ru.dmvow.model.pmml.models.common
 		/**
 		 * Array of MiningField objects. Must be not empty.
 		 */
-		public var miningFields:Array = new Array();
+		public var miningFields:ArrayCollection = new ArrayCollection();
 	}
 }

@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.transformationDictionary
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -22,10 +24,10 @@ package ru.dmvow.model.pmml.transformationDictionary
 		/**
 		 * Array of DefineFunction objects.
 		 */
-		public var defineFunctions:Array = new Array();
+		public var defineFunctions:ArrayCollection = new ArrayCollection();
 		/**
 		 * Array of DerivedField objects.
 		 */
-		public var derivedFields:Array = new Array();
+		public var derivedFields:ArrayCollection = new ArrayCollection();
 	}
 }
