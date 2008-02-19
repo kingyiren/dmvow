@@ -1,9 +1,10 @@
 package ru.dmvow.model.custom.models.assotiationModel
 {
-	import ru.dmvow.model.pmml.models.associationModel.Item;
+	import ru.dmvow.model.pmml.models.associationModel.PMMLItem;
 
-	public class CustomItem extends Item
+	public class CustomItem extends PMMLItem
 	{
-		public var className:String;
+		[Bindable]
+		public var itemClass:ItemClass;
 	}
 }

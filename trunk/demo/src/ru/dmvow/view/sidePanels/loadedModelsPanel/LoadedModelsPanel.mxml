@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel
+	title="Loaded models" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical"
+	paddingTop="5"
+	paddingRight="5"
+	paddingBottom="5"
+	paddingLeft="5"
+	xmlns:loadedModelsPanel="ru.dmvow.view.sidePanels.loadedModelsPanel.*">
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.events.sidePanels.SidePanelsEvent;
+			import mx.events.ListEvent;
+			import mx.collections.ArrayCollection;
+			import ru.dmvow.model.DataModel;
+			
+			[Embed(source="../../../../../../assets/icons/pmml.png")]
+			protected var pmmlIcon:Class;
+			[Embed(source="../../../../../../assets/icons/sql.png")]
+			protected var sqlIcon:Class;
+			[Embed(source="../../../../../../assets/icons/unknown.png")]
+			protected var unknownIcon:Class;
+			
+			protected var _models:ArrayCollection;
+			protected var _selectedModel:DataModel;
+			
+			[Bindable]
+			public function get models():ArrayCollection
+			{
+				return _models;
+			}
+			
+			public function set models(value:ArrayCollection):void
+			{
+				_models = value;
+			}
+			
+			[Bindable]
+			public function get selectedModel():DataModel
+			{
+				return _selectedModel;
+			}
+			
+			public function set selectedModel(value:DataModel):void
+			{
+				_selectedModel = value;
+			}
+			
+			protected function myIconFunction(item:DataModel):Class
+			{
+				var result:Class;
+				if (item.source == DataModel.FROM_PMML)
+					result = pmmlIcon;
+				else if (item.source == DataModel.FROM_SQL)
+					result = sqlIcon;
+				else
+					result = unknownIcon;	
+				
+				return result;
+			}
+			
+			protected function onModelListChange(event:ListEvent):void
+			{
+				selectedModel = modelsList.selectedItem as DataModel;
+			}
+			
+			protected function onAddButtonClick(event:Event):void
+			{
+				// показать контролы для добавления новой модели
+				addRemoteModel.show();
+			}
+			
+			protected function onRemoveButtonClick(event:Event):void
+			{
+				// удалить выбранную модель из списка
+				var newEvent:SidePanelsEvent = new SidePanelsEvent(SidePanelsEvent.REMOVE_MODEL);
+				newEvent.data = modelsList.selectedIndex;
+				newEvent.dispatch();
+			}
+			
+			protected function onAddRemoteModelStateChange(event:Event):void
+			{
+				addButton.enabled = 
+					addRemoteModel.currentState == AddRemoteModel.COMMON_STATE ||
+					addRemoteModel.currentState == AddRemoteModel.ERROR_STATE;
+				
+				addRemoteModel.includeInLayout = 	
+				addRemoteModel.visible = (addRemoteModel.currentState != AddRemoteModel.COMMON_STATE);
+			}
+		]]>
+	</mx:Script>
+	<mx:List 
+		id="modelsList"
+		width="100%"
+		height="140" 
+		iconFunction="myIconFunction" 
+		labelField="name" 
+		dataProvider="{models}"
+		change="onModelListChange(event)">
+	</mx:List>
+	<mx:HBox width="100%">
+		<mx:Button 
+			id="addButton" 
+			label="Добавить" 
+			click="onAddButtonClick(event)"/>
+		<mx:Button id="removeButton" enabled="{modelsList.selectedItem != null}" label="Удалить" click="onRemoveButtonClick(event)"/>
+	</mx:HBox>
+	<loadedModelsPanel:AddRemoteModel width="100%" id="addRemoteModel" includeInLayout="false" visible="false" currentStateChange="onAddRemoteModelStateChange(event)"/>
+</mx:Panel>

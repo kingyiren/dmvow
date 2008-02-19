@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TabNavigator 
+	width="70%" 
+	height="100%"
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+	creationComplete="onCreationComplete(event)"
+	>
+	<!-- Содержимое таб-навигатора -->
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.control.dataNet.builders.DataNetBuilders;
+			import ru.dmvow.view.common.MessageView;
+			import mx.controls.Label;
+			import mx.containers.Canvas;
+			import ru.dmvow.view.field.dataNet.DataNetView;
+			import ru.dmvow.model.DataModel;
+			
+			protected var _model:DataModel;
+			protected var dataNetBuilders:DataNetBuilders;
+			protected var _availableNets:Array;
+			protected var children:Array;
+			protected var emptyView:MessageView;
+			
+			[Bindable]
+			public function get model():DataModel
+			{
+				return _model;
+			}
+			
+			public function set model(value:DataModel):void
+			{
+				for each (var view:DataNetView in children)
+					if (view.active)
+						view.deactivate();
+				
+				_model = value;
+				
+				availableNets = dataNetBuilders.getAvailableDataNets(_model);
+			}
+			
+			[Bindable]
+			public function get availableNets():Array
+			{
+				return _availableNets;
+			}
+			
+			public function set availableNets(value:Array):void
+			{
+				_availableNets = value;
+				
+				redrawTabs();
+			}
+			
+			protected function redrawTabs():void
+			{
+				this.removeAllChildren();
+				
+				if (_availableNets && _availableNets.length > 0)
+				{				
+					children = new Array();
+					var child:DataNetView;
+					for (var i:Number = 0; i < _availableNets.length; i++)
+					{
+						child = new DataNetView();
+						child.visible = false;
+						children.push(child);
+						
+						addChild(child);
+					}
+					for (i = 0; i < children.length; i++)
+					{
+						child = children[i] as DataNetView; 
+						child.preBuildDataNet = _availableNets[i];
+						child.label = child.preBuildDataNet.viewTitle;
+					}
+					
+					children[0].activate();
+					
+					tabBar.selectedIndex = 0; 
+				}
+				else
+				{
+					addEmptyTab();
+				}
+			}
+			
+			protected function addEmptyTab():void
+			{
+				addChild(emptyView);
+			}
+			
+			protected function onCreationComplete(event:Event):void
+			{
+				dataNetBuilders = new DataNetBuilders();
+				emptyView = new MessageView();
+				emptyView.label = "Please, select model to display.";
+				redrawTabs();
+			}
+		]]>
+	</mx:Script>
+</mx:TabNavigator>	

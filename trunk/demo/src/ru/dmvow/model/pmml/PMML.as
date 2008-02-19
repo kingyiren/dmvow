@@ -60,18 +60,24 @@ package ru.dmvow.model.pmml
 	public class PMML
 	{
 		/** Required. */
+		[Bindable]
 		public var version:String;
 		/** Required. */
+		[Bindable]
 		public var header:Header;
 		/** Optional. */
+		[Bindable]
 		public var miningBuildTask:MiningBuildTask;
 		/** Required. */
+		[Bindable]
 		public var dataDictionary:DataDictionary;
 		/** Optional. */
+		[Bindable]
 		public var transformationDictionary:TransformationDictionary;
 		/**
 		 * Array of MiningModel objects - models. Can be empty.
 		 */
-		public var models:Array = new Array();
+		[Bindable]
+		public var models:ArrayCollection = new ArrayCollection();
 	}
 }

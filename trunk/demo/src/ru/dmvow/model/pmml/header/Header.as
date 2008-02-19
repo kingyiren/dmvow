@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.header
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	import ru.dmvow.model.pmml.common.Timestamp;
 	
@@ -33,13 +35,18 @@ package ru.dmvow.model.pmml.header
 	 */
 	public class Header extends Extendable
 	{
+		[Bindable]
 		public var copyright:String;
+		[Bindable]
 		public var description:String;
 		/** Optional. */
+		[Bindable]
 		public var application:Application;
 		/** Array of Annotation objects. Can be empty. */
-		public var annotations:Array = new Array();
+		[Bindable]
+		public var annotations:ArrayCollection = new ArrayCollection();
 		/** Array of Annotation objects. Can be empty. */
+		[Bindable]
 		public var timestamp:Timestamp;
 	}
 }

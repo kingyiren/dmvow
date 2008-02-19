@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	creationComplete="onCreationComplete()"
+	enterFrame="onEnterFrame()"
+	>
+	<mx:Canvas id="all" width="100%" height="100%"/>
+	<mx:HBox x="190" y="10" backgroundColor="#D6D6D6" backgroundAlpha="0.3" cornerRadius="5">
+		<mx:LinkButton label="Default" click="{setFormatting(DEFAULT);}"/>
+		<mx:LinkButton label="Class-based" click="{setFormatting(CLASS_BASED);}"/>
+		<mx:LinkButton label="Link-based" click="{setFormatting(LINK_BASED);}"/>
+	</mx:HBox>
+	<mx:Script>
+		<![CDATA[
+			import org.cove.ape.Vector;
+			import ru.dmvow.model.custom.models.assotiationModel.CustomAssociationModel;
+			import ru.dmvow.view.apeLayouts.DefaultLayout;
+			import mx.core.UIComponent;
+			import org.cove.ape.APEngine;
+			import mx.collections.ArrayCollection;
+			import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationRule;
+			import ru.dmvow.model.pmml.models.associationModel.PMMLItemset;
+			import ru.dmvow.model.custom.models.assotiationModel.CustomItem;
+			import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationModel;
+			
+			protected static const DEFAULT:String = "default";
+			protected static const CLASS_BASED:String = "class_based";
+			protected static const LINK_BASED:String = "link_based";
+			
+			protected var _model:PMMLAssociationModel = null;
+			protected var container:Sprite;
+			
+			[Bindable]
+			public function get model():PMMLAssociationModel
+			{
+				return _model;
+			}
+			
+			public function set model(value:PMMLAssociationModel):void
+			{
+				_model = value;
+				
+				if (all)
+				{
+					setFormatting(DEFAULT);
+				}
+			}
+			
+			protected function setFormatting(value:String):void
+			{
+				if (_model)
+				{
+					var defaultLayout:DefaultLayout = new DefaultLayout(CustomAssociationModel(_model));
+					APEngine.addGroup(defaultLayout);
+				}
+			}
+			
+			// event handlers
+			
+			protected function onCreationComplete():void
+			{
+				var uiComp:UIComponent = new UIComponent();
+				container = new Sprite();
+				uiComp.addChild(container);
+				all.addChild(uiComp);
+				
+				// Initialize the engine. The argument here is the time step value. 
+				// Higher values scale the forces in the sim, making it appear to run
+				// faster or slower. Lower values result in more accurate simulations.
+				APEngine.init(0.8);
+				
+				// set up the default diplay container
+				APEngine.container = container;
+				
+				// gravity -- particles of varying masses are affected the same
+				//APEngine.addMasslessForce(new Vector(0, 3));
+				
+				if (_model)
+				{
+					setFormatting(DEFAULT);
+				}
+			}
+			
+			protected function onEnterFrame():void
+			{
+				APEngine.step();
+				APEngine.paint();
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>

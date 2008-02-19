@@ -1,5 +1,7 @@
 package ru.dmvow.model.pmml.dataDictionary
 {
+	import mx.collections.ArrayCollection;
+	
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -23,6 +25,6 @@ package ru.dmvow.model.pmml.dataDictionary
 		/**
 		 * Array of ChildParent objects. Must be not empty.
 		 */
-		public var childParents:Array = new Array();
+		public var childParents:ArrayCollection = new ArrayCollection();
 	}
 }

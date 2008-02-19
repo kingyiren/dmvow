@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%" 
+	height="100%" 
+	xmlns:common="ru.dmvow.view.common.*"
+	creationComplete="onCreationComplete(event)"
+	resize="onResize(event)"
+	mouseDown="onMouseDownHandler(event)"
+	mouseUp="onMouseUpHandler(event)"
+	buttonMode="true"
+	useHandCursor="true"
+	mouseWheel="onMouseWheelHandler(event)"
+	>
+	<mx:Metadata>
+		[Event(name="activate", type="ru.dmvow.events.field.DataNetViewEvent")]
+		[Event(name="deactivate", type="ru.dmvow.events.field.DataNetViewEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.events.field.DataNetViewEvent;
+			import ru.dmvow.control.dataNet.APEManager;
+			import mx.events.FlexEvent;
+			import ru.dmvow.control.dataNet.builders.DataNetViewBuilder;
+			import ru.dmvow.control.dataNet.builders.DataNetBuilders;
+			import ru.dmvow.model.view.dataNet.DataNet;
+			import ru.dmvow.model.view.dataNet.PreBuildDataNet;
+			
+			protected static const ERROR_STATE:String = "error_state";
+			protected static const EMPTY_STATE:String = "empty_state";
+			protected static const BUILDING_NET_STATE:String = "building_net_state";
+			protected static const BUILDING_VIEW_STATE:String = "building_view_state";
+			protected static const VIEW_STATE:String = "view_state";
+			
+			protected var inited:Boolean = false;
+			protected var dragging:Boolean = false;
+			protected var _active:Boolean = false;
+			protected var _groups:Array;
+			protected var _dataNet:DataNet;
+			protected var _container:Sprite;
+			protected var _preBuildDataNet:PreBuildDataNet;
+			protected var dataNetBuilders:DataNetBuilders;
+			protected var viewBuilder:DataNetViewBuilder;
+			protected var upToDate:Boolean;
+			
+			protected function init():void
+			{
+				if (inited)
+					return;
+					
+				inited = true;
+				
+				dataNetBuilders = new DataNetBuilders();
+				dataNetBuilders.addEventListener(Event.COMPLETE, onDataNetBuildersComplete); 
+				dataNetBuilders.addEventListener(ErrorEvent.ERROR, onDataNetBuildersError);
+				
+				viewBuilder = new DataNetViewBuilder();
+				viewBuilder.addEventListener(Event.COMPLETE, onViewBuilderComplete); 
+				viewBuilder.addEventListener(ErrorEvent.ERROR, onViewBuilderError);
+				
+				currentState = EMPTY_STATE;
+				
+				addEventListener(FlexEvent.SHOW, onShow);
+				addEventListener(FlexEvent.HIDE, onHide);
+				
+				upToDate = false;
+			}
+			
+			public function get active():Boolean
+			{
+				return _active;
+			}
+			
+			[Bindable]
+			public function get preBuildDataNet():PreBuildDataNet
+			{
+				return _preBuildDataNet;
+			}
+			
+			public function set preBuildDataNet(value:PreBuildDataNet):void
+			{
+				_preBuildDataNet = value;
+				
+				upToDate = false;
+				if (visible)
+				{
+					startShowProcess();
+				}
+			}
+			
+			public function get container():Sprite
+			{
+				if (uiContainer.numChildren == 0)
+				{
+					_container = new Sprite();
+					uiContainer.addChild(_container);
+				}
+				
+				return _container;
+			}
+			
+			public function get groups():Array
+			{
+				if (!_groups)
+					throw new Error(this + " groups are not ready yet.");
+				
+				return _groups;
+			}
+			
+			protected function startShowProcess():void
+			{
+				init();
+				
+				_active = true;
+				
+				if (!upToDate)
+				{
+					currentState = BUILDING_NET_STATE;
+					dataNetBuilders.build(preBuildDataNet);
+				}
+				else
+				{
+					endShowProcess();
+				}
+			}
+			
+			public function activate():void
+			{
+				if (!_active)
+				{
+					startShowProcess();
+				}
+			}
+			
+			public function deactivate():void
+			{
+				if (_active)
+				{
+					_active = false;
+					APEManager.hide(this);
+					
+					dispatchEvent(new DataNetViewEvent(DataNetViewEvent.DEACTIVATE));
+				}
+			}
+			
+			protected function endShowProcess():void
+			{
+				currentState = VIEW_STATE;
+				APEManager.show(this, !upToDate);
+				upToDate = true;
+				
+				dispatchEvent(new DataNetViewEvent(DataNetViewEvent.ACTIVATE));
+			}
+			
+			// event handlers
+			
+			protected function onShow(event:Event):void
+			{
+				if (preBuildDataNet)
+				{
+					startShowProcess();
+				}
+			}
+			
+			protected function onHide(event:Event):void
+			{
+				deactivate();
+			}
+			
+			protected function onDataNetBuildersComplete(event:Event):void
+			{
+				currentState = BUILDING_VIEW_STATE;
+				
+				viewBuilder.build(dataNetBuilders.result);
+			}
+			
+			protected function onDataNetBuildersError(event:Event):void
+			{
+				currentState = ERROR_STATE;
+			}
+			
+			protected function onViewBuilderComplete(event:Event):void
+			{
+				_groups = viewBuilder.result;
+				
+				endShowProcess();
+			}
+			
+			protected function onViewBuilderError(event:Event):void
+			{
+				currentState = ERROR_STATE;
+			}
+			
+			protected function onCreationComplete(event:Event):void
+			{
+				init();
+				
+				onResize(null);
+			}
+			
+			protected function onMaskAddedToStage(event:Event):void
+			{
+				onResize(null);
+			}
+			
+			protected function onResize(event:Event):void
+			{
+				if (_mask)
+				{
+					_mask.graphics.clear();
+					_mask.graphics.beginFill(0xFFCC00, 1);
+					_mask.graphics.drawRect(0, 0, width, height);
+					_mask.graphics.endFill();
+				}
+			}
+			
+			protected function onMouseDownHandler(event:MouseEvent):void
+			{
+				if (event.target == event.currentTarget)
+				{
+					APEManager.pause();
+					
+					container.startDrag();
+					
+					dragging = true;
+				}
+			}
+			
+			protected function onMouseUpHandler(event:MouseEvent):void
+			{
+				if (dragging)
+				{
+					container.stopDrag();
+					
+					APEManager.unpause();
+				}
+			}
+			
+			protected function onMouseWheelHandler(event:MouseEvent):void
+			{
+				var scaleDelta:Number = (event.delta > 0 ? 0.1 : -0.1);
+				
+				APEManager.pauseFor(1000);
+				if (container.scaleX < 0.15 && scaleDelta < 0)
+					return;
+				
+				container.scaleX += scaleDelta;
+				container.scaleY += scaleDelta;
+			}
+		]]>
+	</mx:Script>
+	<mx:states>
+		<mx:State name="{EMPTY_STATE}">
+			<mx:AddChild>
+				<common:MessageView label="Empty."/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{ERROR_STATE}">
+			<mx:AddChild>
+				<common:MessageView id="error" label="Error."/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{BUILDING_NET_STATE}">
+			<mx:AddChild>
+				<common:MessageView label="Building net..."/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{BUILDING_VIEW_STATE}">
+			<mx:AddChild>
+				<common:MessageView label="Building view..."/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{VIEW_STATE}">
+			<mx:AddChild>
+				<mx:UIComponent id="_mask" addedToStage="onMaskAddedToStage(event)"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:UIComponent id="uiContainer" mask="{_mask}"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+</mx:Canvas>

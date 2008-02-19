@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical"
+	title="Association Model Properties"
+	paddingLeft="5"
+	paddingRight="5"
+	paddingBottom="5"
+	>
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.model.custom.models.assotiationModel.CustomItem;
+			import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationModel;
+			
+			protected var _model:PMMLAssociationModel = null;
+			
+			[Bindable]
+			public function get model():PMMLAssociationModel
+			{
+				return _model;
+			}
+			
+			public function set model(value:PMMLAssociationModel):void
+			{
+				_model = value;
+			}
+		]]>
+	</mx:Script>
+	<mx:Form width="100%">
+		<mx:FormItem label="Transactions">
+			<mx:Label text="{model.numberOfTransactions}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Max Items/Trans">
+			<mx:Label text="{model.maxNumberOfItemsPerTA}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Avg Items/Trans">
+			<mx:Label text="{model.avgNumberOfItemsPerTA}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Minimum support">
+			<mx:Label text="{model.minimumSupport}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Minimum confidence">
+			<mx:Label text="{model.minimumConfidence}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Length limit">
+			<mx:Label text="{model.lengthLimit}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Items">
+			<mx:Label text="{model.numberOfItems}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Itemsets">
+			<mx:Label text="{model.numberOfItemsets}"/>
+		</mx:FormItem>
+		<mx:FormItem label="Rules">
+			<mx:Label text="{model.numberOfRules}"/>
+		</mx:FormItem>
+	</mx:Form>
+</mx:Panel>
