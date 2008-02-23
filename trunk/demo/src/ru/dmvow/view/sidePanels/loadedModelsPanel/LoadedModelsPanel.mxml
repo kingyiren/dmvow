@@ -67,13 +67,11 @@
 			
 			protected function onAddButtonClick(event:Event):void
 			{
-				// показать контролы для добавления новой модели
 				addRemoteModel.show();
 			}
 			
 			protected function onRemoveButtonClick(event:Event):void
 			{
-				// удалить выбранную модель из списка
 				var newEvent:SidePanelsEvent = new SidePanelsEvent(SidePanelsEvent.REMOVE_MODEL);
 				newEvent.data = modelsList.selectedIndex;
 				newEvent.dispatch();
@@ -92,19 +90,29 @@
 	</mx:Script>
 	<mx:List 
 		id="modelsList"
-		width="100%"
-		height="140" 
+		width="100%" 
 		iconFunction="myIconFunction" 
 		labelField="name" 
 		dataProvider="{models}"
-		change="onModelListChange(event)">
+		change="onModelListChange(event)"
+		maxHeight="140" 
+		height="{(modelsList.dataProvider.length + 1) * 22}">
 	</mx:List>
 	<mx:HBox width="100%">
 		<mx:Button 
 			id="addButton" 
-			label="Добавить" 
+			label="Add" 
 			click="onAddButtonClick(event)"/>
-		<mx:Button id="removeButton" enabled="{modelsList.selectedItem != null}" label="Удалить" click="onRemoveButtonClick(event)"/>
+		<mx:Button 
+			id="removeButton" 
+			enabled="{modelsList.selectedItem != null}" 
+			label="Remove" 
+			click="onRemoveButtonClick(event)"/>
 	</mx:HBox>
-	<loadedModelsPanel:AddRemoteModel width="100%" id="addRemoteModel" includeInLayout="false" visible="false" currentStateChange="onAddRemoteModelStateChange(event)"/>
+	<loadedModelsPanel:AddRemoteModel 
+		width="100%" 
+		id="addRemoteModel" 
+		includeInLayout="false" 
+		visible="false" 
+		currentStateChange="onAddRemoteModelStateChange(event)"/>
 </mx:Panel>
