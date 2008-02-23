@@ -11,5 +11,7 @@ package ru.dmvow.model.view
 		public var models:ArrayCollection;
 		[Bindable]
 		public var selectedModel:DataModel;
+		[Bindable]
+		public var interestingMeasures:ArrayCollection = new ArrayCollection();
 	}
 }
