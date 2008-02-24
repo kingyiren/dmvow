@@ -29,7 +29,7 @@
 			
 			private function onAdd(event:Event):void
 			{
-				var panel:AddInterestingMeasurePanel = new AddInterestingMeasurePanel();
+				var panel:AddInterestingMeasure = new AddInterestingMeasure();
 				PopUpManager.addPopUp(panel, DMVoW.instance, true);
 				PopUpManager.centerPopUp(panel);
 			}
