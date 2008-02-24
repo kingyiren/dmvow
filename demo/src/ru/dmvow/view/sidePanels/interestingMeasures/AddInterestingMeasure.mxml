@@ -37,8 +37,9 @@
 	</mx:HBox>
 	<mx:HBox>
 		<mx:Label text="Name:"/>
-		<mx:TextInput id="nameInput" width="220" backgroundColor="0xFFFFFF" backgroundAlpha="1"/> 
+		<mx:TextInput id="nameInput" width="200" backgroundColor="0xFFFFFF" backgroundAlpha="1"/> 
 		<mx:Button enabled="{targetList.dataProvider.length > 0}" label="Save" click="onSave(event)"/>
+		<mx:Button label="Cancel" click="onCancel(event)"/>
 	</mx:HBox>
 	<mx:Script>
 		<![CDATA[
@@ -85,6 +86,11 @@
 				var newEvent:SidePanelsEvent = new SidePanelsEvent(SidePanelsEvent.ADD_INTERESTING_MEASURE);
 				newEvent.data = measure;
 				newEvent.dispatch();
+			}
+			
+			private function onCancel(event:Event):void
+			{
+				PopUpManager.removePopUp(this);
 			}
 		]]>
 	</mx:Script>
