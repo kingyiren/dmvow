@@ -1,5 +1,6 @@
 package ru.dmvow.model.pmml.models.associationModel
 {
+	import ru.dmvow.model.common.IItem;
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -19,7 +20,7 @@ package ru.dmvow.model.pmml.models.associationModel
 	 * </code>
 	 * </p>
 	 */
-	public class PMMLItem extends Extendable
+	public class PMMLItem extends Extendable implements IItem
 	{
 		/**
 		 * Required.
@@ -41,6 +42,16 @@ package ru.dmvow.model.pmml.models.associationModel
 		 */
 		[Bindable]
 		public var weight:Number;
+		
+		public function get itemName():String
+		{
+			return value;
+		}
+		
+		public function get itemValue():String
+		{
+			return mappedValue;
+		}
 		
 		public function toString():String
 		{

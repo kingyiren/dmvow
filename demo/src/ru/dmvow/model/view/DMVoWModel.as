@@ -3,6 +3,7 @@ package ru.dmvow.model.view
 	import mx.collections.ArrayCollection;
 	
 	import ru.dmvow.model.DataModel;
+	import ru.dmvow.model.view.processingList.ProcessingList;
 	
 	public class DMVoWModel
 	{

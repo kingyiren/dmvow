@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	creationComplete="onCreationComplete(event)" width="100%">
+	<mx:Script>
+		<![CDATA[
+			import mx.flash.UIMovieClip;
+			import mx.binding.utils.BindingUtils;
+			import mx.core.UIComponent;
+			import ru.dmvow.model.view.processingList.items.ProcessingListItem;
+			
+			/*[Embed(source="/../assets/icons/processing.swf", symbol="NeverProcessed")]
+			private static var neverProcessed:Class;
+			[Embed(source="/../assets/icons/processing.swf", symbol="Empty")]
+			private static var empty:Class;
+			[Embed(source="/../assets/icons/processing.swf", symbol="InProcess")]
+			private static var inProcess:Class;
+			[Embed(source="/../assets/icons/processing.swf", symbol="Valid")]
+			private static var valid:Class;
+			[Embed(source="/../assets/icons/processing.swf", symbol="NotValid")]
+			private static var notValid:Class;*/
+			
+			private var _listIcon:UIMovieClip;
+			private var _listData:ProcessingListItem;
+			
+			[Bindable]
+			public function set listData(value:ProcessingListItem):void
+			{
+				_listData = value;
+				
+				listIcon = getIconClass();
+			}
+			
+			public function get listData():ProcessingListItem
+			{
+				return _listData;
+			}
+			
+			private function set listIcon(value:Class):void
+			{
+				if (_listIcon)
+					hBox.removeChild(_listIcon);
+				
+				_listIcon = new value();
+				
+				hBox.addChildAt(_listIcon, 0);
+			}
+			
+			private function getIconClass():Class
+			{
+				var result:Class;
+				if (_listData.status == ProcessingListItem.EMPTY)
+					result = Empty;
+				else if (_listData.status == ProcessingListItem.IN_PROCESS)
+					result = InProcess;
+				else if (_listData.status == ProcessingListItem.NEVER_PROCESSED)
+					result = NeverProcessed;
+				else if (_listData.status == ProcessingListItem.NOT_VALID)
+					result = NotValid;
+				else if (_listData.status == ProcessingListItem.VALID)
+					result = Valid;
+				else
+					throw new Error("Error.");
+					
+				return result;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				BindingUtils.bindProperty(this, "listData", this, "data");
+			} 
+		]]>
+	</mx:Script>
+	<mx:Canvas width="100%" height="100%">
+		<mx:HBox id="hBox" height="100%" verticalAlign="middle">
+			<!-- 
+				<- Here the icon will be dynamicly added 
+			-->
+			<mx:Label id="nameLabel" text="{listData.name}"/>
+		</mx:HBox>
+		<mx:Canvas right="5" height="100%">
+			<mx:HBox horizontalAlign="right" height="100%" verticalAlign="middle">
+				<mx:Button
+					id="editButton"
+					label="Edit"
+					fontWeight="normal"
+					visible="{listData.editable}"
+					includeInLayout="{editButton.visible}"/>
+				<mx:Button 
+					id="showButton" 
+					label="Show" 
+					fontWeight="normal"
+					visible="{!listData.isCurrent}" 
+					enabled="{listData.status != ProcessingListItem.IN_PROCESS}"
+					includeInLayout="{showButton.visible}"/>
+				<mx:Label 
+					id="isCurrentLabel" 
+					text="current" 
+					visible="{listData.isCurrent}"
+					includeInLayout="{isCurrentLabel.visible}"/>
+			</mx:HBox>
+		</mx:Canvas>
+	</mx:Canvas>
+</mx:VBox>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	creationComplete="onCreationComplete(event)" 
+	xmlns:itemsFilter="ru.dmvow.view.sidePanels.filtersList.itemsFilter.*">
+	<itemsFilter:MustHaveToggle id="mustHaveToggle"/>
+	<mx:Label text="{itemPattern.itemName}"/>
+	<mx:Script>
+		<![CDATA[
+			import mx.binding.utils.ChangeWatcher;
+			import mx.binding.utils.BindingUtils;
+			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemPattern;
+			
+			private var _itemPattern:ItemPattern;
+			private var watcher:ChangeWatcher;
+			
+			[Bindable]
+			public function set itemPattern(value:ItemPattern):void
+			{
+				if (_itemPattern && watcher)
+					watcher.unwatch();
+				
+				_itemPattern = value;
+				
+				if (_itemPattern)
+				{
+					mustHaveToggle.mustHave = _itemPattern.mustHave;
+					
+					watcher = BindingUtils.bindProperty(itemPattern, "mustHave", mustHaveToggle, "mustHave");
+				}
+			}
+		
+			public function get itemPattern():ItemPattern
+			{
+				return _itemPattern;
+			}
+		
+			private function onCreationComplete(event:Event):void
+			{
+				BindingUtils.bindProperty(this, "itemPattern", this, "data");
+			}
+		]]>
+	</mx:Script>
+</mx:HBox>

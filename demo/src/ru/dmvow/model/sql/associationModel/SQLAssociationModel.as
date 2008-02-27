@@ -2,7 +2,9 @@ package ru.dmvow.model.sql.associationModel
 {
 	import mx.collections.ArrayCollection;
 	
-	public class SQLAssociationModel
+	import ru.dmvow.model.common.IDataModel;
+	
+	public class SQLAssociationModel implements IDataModel
 	{
 		/** MODEL_NAME */
 		[Bindable]
@@ -68,6 +70,21 @@ package ru.dmvow.model.sql.associationModel
 			}
 			
 			return null;
+		}
+		
+		public function clone():SQLAssociationModel
+		{
+			var result:SQLAssociationModel = new SQLAssociationModel();
+			
+			// TODO
+			//result.name =
+			
+			return result; 
+		}
+		
+		public function get modelItems():ArrayCollection
+		{
+			return items;
 		}
 		
 		/*public function getAssociationRuleById(id:String):SQLAssociationRule

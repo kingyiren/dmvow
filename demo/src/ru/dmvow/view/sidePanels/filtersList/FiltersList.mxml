@@ -1,4 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical">
-	
+<mx:Panel 
+	title="Rule filters list"
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical"
+	xmlns:items="ru.dmvow.model.view.processingList.items.*" 
+	xmlns:control="ru.dmvow.control.*"
+	creationComplete="onCreationComplete(event)"
+	paddingTop="5"
+	paddingRight="5"
+	paddingBottom="5"
+	paddingLeft="5"
+	>
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilterEvent;
+			import mx.managers.PopUpManager;
+			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
+			import ru.dmvow.control.filters.ItemsFilter;
+			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilter;
+			import ru.dmvow.model.DataModel;
+			
+			private var _model:DataModel;
+			private var editItemsFilter:EditItemsFilter = new EditItemsFilter();
+			private var editFilterIndex:Number; 
+			
+			[Bindable]
+			public function set model(value:DataModel):void
+			{
+				_model = value;
+			}
+			
+			public function get model():DataModel
+			{
+				return _model;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				list.itemRenderer = new ClassFactory(FiltersListRenderer);
+				
+				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
+				editItemsFilter.addEventListener(EditItemsFilterEvent.CANCEL, onEditItemsFilterCancel, false, 0, true);
+			}
+			
+			private function onAddItemsFilter(event:Event):void
+			{
+				editItemsFilter.newFilter = true;
+				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
+				editItemsFilter.items = model.data.dataModel.modelItems;
+				
+				PopUpManager.addPopUp(editItemsFilter, DMVoW.instance, true);
+				PopUpManager.centerPopUp(editItemsFilter);
+			}
+			
+			// model.processingList.addItem(editItemsFilter.itemsFilterItem);
+			
+			private function onEditItemsFilterSave(event:EditItemsFilterEvent):void
+			{
+				PopUpManager.removePopUp(editItemsFilter);
+				
+				if (editItemsFilter.newFilter)
+					model.processingList.addItem(editItemsFilter.itemsFilterItem);
+			}
+			
+			private function onEditItemsFilterCancel(event:EditItemsFilterEvent):void
+			{
+				PopUpManager.removePopUp(editItemsFilter);
+				
+				if (editItemsFilter.newFilter)
+					model.processingList.removeItemAt(model.processingList.length - 1);
+			}
+		]]>
+	</mx:Script>
+	<mx:List id="list" dataProvider="{model.processingList}" width="100%" rowHeight="32"/>
+	<mx:Button label="Add rule content filter" click="onAddItemsFilter(event)"/>
+	<control:FiltersListController model="{model}"/>
 </mx:Panel>

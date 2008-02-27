@@ -7,7 +7,7 @@
 	paddingRight="5"
 	paddingBottom="5"
 	paddingLeft="5"
-	xmlns:loadedModelsPanel="ru.dmvow.view.sidePanels.loadedModelsPanel.*">
+	xmlns:loadedModels="ru.dmvow.view.sidePanels.loadedModels.*">
 	<mx:Script>
 		<![CDATA[
 			import ru.dmvow.events.sidePanels.SidePanelsEvent;
@@ -109,7 +109,7 @@
 			label="Remove" 
 			click="onRemoveButtonClick(event)"/>
 	</mx:HBox>
-	<loadedModelsPanel:AddRemoteModel 
+	<loadedModels:AddRemoteModel 
 		width="100%" 
 		id="addRemoteModel" 
 		includeInLayout="false" 

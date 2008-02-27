@@ -2,9 +2,13 @@ package ru.dmvow.model.pmml
 {
 	import mx.collections.ArrayCollection;
 	
+	import ru.dmvow.model.common.IClone;
+	import ru.dmvow.model.common.IData;
+	import ru.dmvow.model.common.IDataModel;
 	import ru.dmvow.model.pmml.dataDictionary.DataDictionary;
 	import ru.dmvow.model.pmml.header.Header;
 	import ru.dmvow.model.pmml.miningBuildTask.MiningBuildTask;
+	import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationModel;
 	import ru.dmvow.model.pmml.transformationDictionary.TransformationDictionary;
 	
 	/**
@@ -57,7 +61,7 @@ package ru.dmvow.model.pmml
 	 * </code>
 	 * </p>
 	 */
-	public class PMML
+	public class PMML implements IClone, IData
 	{
 		/** Required. */
 		[Bindable]
@@ -79,5 +83,24 @@ package ru.dmvow.model.pmml
 		 */
 		[Bindable]
 		public var models:ArrayCollection = new ArrayCollection();
+		
+		public function clone():Object
+		{
+			var result:PMML = new PMML();
+			
+			// TODO
+			
+			return result;
+		}
+		
+		public function get dataName():String
+		{
+			return header.description;
+		}
+		
+		public function get dataModel():IDataModel
+		{
+			return models[0] as PMMLAssociationModel;
+		}
 	}
 }
