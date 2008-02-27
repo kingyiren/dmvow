@@ -74,12 +74,12 @@ package ru.dmvow.control.dataNet.builders
 				if (preParseDataNet.viewType == PreBuildDataNet.ITEMS_VIEW)
 				{
 					pmmlBuilder.createItemsNet(
-						(preParseDataNet.data as PMMLMiningModel).data.models[0]);
+						(preParseDataNet.data as PMMLMiningModel).pmmlData.models[0]);
 				}
 				else if (preParseDataNet.viewType == PreBuildDataNet.RULES_VIEW)
 				{
 					pmmlBuilder.createRulesNet(
-						(preParseDataNet.data as PMMLMiningModel).data.models[0]);
+						(preParseDataNet.data as PMMLMiningModel).pmmlData.models[0]);
 				}
 				else
 				{
@@ -92,12 +92,12 @@ package ru.dmvow.control.dataNet.builders
 				if (preParseDataNet.viewType == PreBuildDataNet.ITEMS_VIEW)
 				{
 					sqlBuilder.createItemsNet(
-						(preParseDataNet.data as SQLMiningModel).data.model);
+						(preParseDataNet.data as SQLMiningModel).sqlData.model);
 				}
 				else if (preParseDataNet.viewType == PreBuildDataNet.RULES_VIEW)
 				{
 					sqlBuilder.createRulesNet(
-						(preParseDataNet.data as SQLMiningModel).data.model);
+						(preParseDataNet.data as SQLMiningModel).sqlData.model);
 				}
 				else  
 				{

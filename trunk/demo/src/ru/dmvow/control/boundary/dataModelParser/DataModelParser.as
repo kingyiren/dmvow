@@ -55,7 +55,7 @@ package ru.dmvow.control.boundary.dataModelParser
 		{
 			var pmmlMiningModel:PMMLMiningModel = new PMMLMiningModel();
 			pmmlMiningModel.data = pmmlParser.result;
-			pmmlMiningModel.name = (pmmlMiningModel.data.models[0] as PMMLAssociationModel).name; 
+			pmmlMiningModel.name = (pmmlMiningModel.pmmlData.models[0] as PMMLAssociationModel).name; 
 			result = pmmlMiningModel; 
 			
 			var event:Event = new Event(Event.COMPLETE);
@@ -66,7 +66,7 @@ package ru.dmvow.control.boundary.dataModelParser
 		{
 			var sqlMiningModel:SQLMiningModel = new SQLMiningModel();
 			sqlMiningModel.data = sqlParser.result;
-			sqlMiningModel.name = (sqlMiningModel.data.model as SQLAssociationModel).name; 
+			sqlMiningModel.name = (sqlMiningModel.sqlData.model as SQLAssociationModel).name; 
 			result = sqlMiningModel;
 			
 			var newEvent:Event = new Event(Event.COMPLETE);

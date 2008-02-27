@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" useHandCursor="true" buttonMode="true" creationComplete="onCreationComplete(event)" click="onClick(event)">
+	<mx:Script>
+		<![CDATA[
+			private var _mustHave:Boolean;
+			
+			[Bindable]
+			public function set mustHave(value:Boolean):void
+			{
+				_mustHave = value;
+				
+				while (numChildren > 0)
+					removeChildAt(0);
+				
+				addChild((_mustHave ? new PlusIcon() : new MinusIcon()));
+			}
+			
+			public function get mustHave():Boolean
+			{
+				return _mustHave;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+			}
+			
+			private function onClick(event:Event):void
+			{
+				mustHave = !mustHave;
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>

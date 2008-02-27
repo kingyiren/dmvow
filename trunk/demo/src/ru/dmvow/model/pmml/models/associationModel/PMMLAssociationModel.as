@@ -2,6 +2,7 @@ package ru.dmvow.model.pmml.models.associationModel
 {
 	import mx.collections.ArrayCollection;
 	
+	import ru.dmvow.model.common.IDataModel;
 	import ru.dmvow.model.pmml.models.MiningModel;
 	
 	/**
@@ -89,7 +90,7 @@ package ru.dmvow.model.pmml.models.associationModel
 	 * </code>
 	 * </p>
 	 */
-	public class PMMLAssociationModel extends MiningModel
+	public class PMMLAssociationModel extends MiningModel implements IDataModel
 	{
 		/** Required. */
 		[Bindable]
@@ -169,6 +170,11 @@ package ru.dmvow.model.pmml.models.associationModel
 			}
 			
 			return null;
+		}
+		
+		public function get modelItems():ArrayCollection
+		{
+			return items;
 		}
 	}
 }

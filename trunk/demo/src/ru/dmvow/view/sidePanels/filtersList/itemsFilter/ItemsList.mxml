@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:List xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.DragEvent;
+			
+			override protected function dragDropHandler(event:DragEvent):void
+			{
+				hideDropFeedback(event);
+			}
+		]]>
+	</mx:Script>
+</mx:List>

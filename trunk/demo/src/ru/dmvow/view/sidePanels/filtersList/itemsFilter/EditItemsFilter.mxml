@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel
+	title="Edit items filter: rule pattern" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical"
+	creationComplete="onCreationComplete(event)"
+	paddingTop="5"
+	paddingRight="5"
+	paddingBottom="5"
+	paddingLeft="5"
+	xmlns:itemsFilter="ru.dmvow.view.sidePanels.filtersList.itemsFilter.*">
+	<mx:Metadata>
+		[Event(name="cancel", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilterEvent")]
+	</mx:Metadata>
+	<mx:VBox>
+		<mx:Text width="100%" text="Drag items from the list of items available in model into the left and right rule constraints. Click 'Plus' or 'Minus' to toggle their existence in the matched rules."/>
+		<mx:HBox verticalAlign="bottom">
+			<mx:VBox>
+				<mx:Label text="Left side constraints:" fontWeight="bold"/>
+				<itemsFilter:SideList 
+					id="leftSideList" 
+					dataProvider="{itemsFilterItem.leftSide}" 
+					width="200" 
+					height="140" 
+					dropEnabled="true" 
+					dragMoveEnabled="true" 
+					dragEnabled="true"
+					allowMultipleSelection="true"/>
+			</mx:VBox>
+			<mx:VRule height="140"/>
+			<mx:VBox>
+				<mx:Label text="Right side constraints:" fontWeight="bold"/>
+				<itemsFilter:SideList 
+					id="rightSideList" 
+					dataProvider="{itemsFilterItem.rightSide}" 
+					width="200" 
+					height="140" 
+					dropEnabled="true" 
+					dragMoveEnabled="true" 
+					dragEnabled="true" 
+					allowMultipleSelection="true"/>
+			</mx:VBox>
+		</mx:HBox>
+		<mx:Spacer height="10"/>
+		<mx:Label text="Items, available in model:" fontWeight="bold"/>
+		<itemsFilter:ItemsList width="100%" id="itemsList" dataProvider="{itemNames}" dragEnabled="true" allowMultipleSelection="true" dropEnabled="true"/>
+		<mx:HBox>
+			<mx:Button label="Save" click="onSave(event)" enabled="{itemsFilterItem.leftSide.length > 0 || itemsFilterItem.rightSide.length > 0}"/>
+			<mx:Button label="Cancel" click="onCancel(event)"/>
+		</mx:HBox>
+	</mx:VBox>
+	<mx:Script>
+		<![CDATA[
+			import mx.events.DragEvent;
+			import mx.managers.PopUpManager;
+			import mx.collections.SortField;
+			import mx.collections.Sort;
+			import mx.collections.ArrayCollection;
+			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
+			
+			private var _itemsFilterItem:ItemsFilterItem;
+			private var _items:ArrayCollection;
+			private var _itemNames:ArrayCollection;
+			private var _newFilter:Boolean;
+			
+			public function set newFilter(value:Boolean):void
+			{
+				_newFilter = value;
+				
+				if (_newFilter)
+					itemsFilterItem = new ItemsFilterItem();
+			}
+			
+			public function get newFilter():Boolean
+			{
+				return _newFilter;
+			}
+			
+			[Bindable]
+			public function set itemsFilterItem(value:ItemsFilterItem):void
+			{
+				_itemsFilterItem = value;
+			}
+			
+			public function get itemsFilterItem():ItemsFilterItem
+			{
+				return _itemsFilterItem;
+			}
+			
+			[Bindable]
+			public function set items(value:ArrayCollection):void
+			{
+				_items = value;
+				
+				// Creating a copy
+				var copy:Array = value.source.concat();
+				copy.sortOn("itemName");
+				
+				for (var i:Number = 0; i < copy.length - 1; i++)
+				{
+					if (copy[i].itemName == copy[i + 1].itemName)
+						copy.splice(i, 1); 
+				}
+				
+				var onlyNamesArray:Array = new Array();
+				for (i = 0; i < copy.length - 1; i++)
+				{
+					onlyNamesArray.push(copy[i].itemName);
+				}
+				var onlyNames:ArrayCollection = new ArrayCollection(onlyNamesArray);
+				
+				itemNames = onlyNames;
+			}
+			
+			public function get items():ArrayCollection
+			{
+				return _items;
+			}
+			
+			[Bindable]
+			private function set itemNames(value:ArrayCollection):void
+			{
+				_itemNames = value;
+			}
+			
+			private function get itemNames():ArrayCollection
+			{
+				return _itemNames;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				leftSideList.itemRenderer = 
+				rightSideList.itemRenderer = new ClassFactory(ItemsFilterItemRenderer);
+			}
+			
+			private function onSave(event:Event):void
+			{
+				var newEvent:EditItemsFilterEvent = new EditItemsFilterEvent(EditItemsFilterEvent.SAVE);
+				dispatchEvent(newEvent);
+			}
+			
+			private function onCancel(event:Event):void
+			{
+				var newEvent:EditItemsFilterEvent = new EditItemsFilterEvent(EditItemsFilterEvent.CANCEL);
+				dispatchEvent(newEvent);
+			}
+		]]>
+	</mx:Script>
+</mx:Panel>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:List xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.DragManager;
+			import mx.collections.ArrayCollection;
+			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemPattern;
+			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
+			import mx.events.DragEvent;
+			
+			override protected function dragDropHandler(event:DragEvent):void
+			{
+				var data:Array = event.dragSource.dataForFormat("items") as Array;
+				
+				for (var i:Number = 0; i < data.length; i++)
+				{
+					if (data[i] is String)
+					{
+						var newItem:ItemPattern = new ItemPattern();
+						newItem.itemName = data[i] as String;
+						
+						(dataProvider as ArrayCollection).addItem(newItem);
+						
+						hideDropFeedback(event);
+					}
+					else if (data[i] is ItemPattern)
+					{
+						super.dragDropHandler(event);
+					}
+				}
+			}
+			
+			override protected function dragEnterHandler(event:DragEvent):void
+			{
+				var data:Array = event.dragSource.dataForFormat("items") as Array;
+				var allow:Boolean = true;
+				
+				for (var i:Number = 0; i < data.length; i++)
+				{
+					if (data[i] is String)
+					{
+						// Check if we don't have this name in list already
+						if (haveInList(data[i] as String))
+						{
+							allow = false;
+							break;
+						}
+					}
+					else if (data[i] is ItemPattern)
+					{
+						// Check if we don't have this name in list already
+						if (haveInList((data[i] as ItemPattern).itemName))
+						{
+							allow = false;
+							break;
+						}
+					}
+				}
+				
+				if (allow)
+				{
+					super.dragEnterHandler(event);
+				}
+				else
+				{
+			        hideDropFeedback(event);
+			        
+			        DragManager.showFeedback(DragManager.NONE);
+				}
+			}
+			
+			private function haveInList(name:String):Boolean
+			{
+				var result:Boolean = false;
+				var arr:Array = (dataProvider as ArrayCollection).source;
+				for each (var itemPattern:ItemPattern in arr)
+				{
+					if (itemPattern.itemName == name)
+					{
+						result = true;
+						break;
+					}
+				}
+				
+				return result;
+			}
+		]]>
+	</mx:Script>
+</mx:List>

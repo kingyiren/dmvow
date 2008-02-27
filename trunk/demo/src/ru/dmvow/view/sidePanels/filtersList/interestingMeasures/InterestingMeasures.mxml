@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	title="Interesting measures" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="vertical"
+	paddingTop="5"
+	paddingRight="5"
+	paddingBottom="5"
+	paddingLeft="5"
+	>
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			import mx.events.ListEvent;
+			import mx.collections.ArrayCollection;
+			
+			private var _interestingMeasures:ArrayCollection; 
+			
+			[Bindable]
+			public function set interestingMeasures(value:ArrayCollection):void
+			{
+				_interestingMeasures = value;
+			}
+			
+			public function get interestingMeasures():ArrayCollection
+			{
+				return _interestingMeasures;
+			}
+			
+			private function onAdd(event:Event):void
+			{
+				var panel:AddInterestingMeasure = new AddInterestingMeasure();
+				PopUpManager.addPopUp(panel, DMVoW.instance, true);
+				PopUpManager.centerPopUp(panel);
+			}
+			
+			private function onRemove(event:Event):void
+			{
+				(list.dataProvider as ArrayCollection).removeItemAt(list.selectedIndex);
+			}
+		]]>
+	</mx:Script>
+	<mx:List dataProvider="{interestingMeasures}" id="list" width="100%" maxHeight="140" height="{(list.dataProvider.length + 1) * 22}"/>
+	<mx:HBox>
+		<mx:Button label="Add" click="onAdd(event)"/>
+		<mx:Button label="Remove" click="onRemove(event)" enabled="{list.selectedItem != null}"/>
+	</mx:HBox>
+</mx:Panel>
