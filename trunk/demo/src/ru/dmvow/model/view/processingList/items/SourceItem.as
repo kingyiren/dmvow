@@ -1,20 +1,18 @@
 package ru.dmvow.model.view.processingList.items
 {
-	public class SourceItem extends ProcessingListItem
+public class SourceItem extends ProcessingListItem
+{
+	public function SourceItem()
 	{
-		public function SourceItem()
-		{
-			super();
-		}
+		super();
 		
-		override public function get name():String
-		{
-			return "Source data";
-		}
-		
-		override public function get status():String
-		{
-			return EMPTY;
-		}
+		name = "Source data";
 	}
+	
+	override protected function getCurrentDescriptionText():String
+	{
+		// The source description never changes
+		return "source";
+	}
+}
 }
