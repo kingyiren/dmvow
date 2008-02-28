@@ -2,6 +2,11 @@
 <mx:VBox 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	creationComplete="onCreationComplete(event)" width="100%">
+	<mx:Metadata>
+		[Event(name="filtersListItemRemove", type="ru.dmvow.view.sidePanels.filtersList.FiltersListItemEvent")]
+		[Event(name="filtersListItemEdit", type="ru.dmvow.view.sidePanels.filtersList.FiltersListItemEvent")]
+		[Event(name="filtersListItemShow", type="ru.dmvow.view.sidePanels.filtersList.FiltersListItemEvent")]
+	</mx:Metadata>
 	<mx:Script>
 		<![CDATA[
 			import mx.flash.UIMovieClip;
@@ -68,7 +73,28 @@
 			private function onCreationComplete(event:Event):void
 			{
 				BindingUtils.bindProperty(this, "listData", this, "data");
-			} 
+			}
+			
+			private function onRemoveClick(event:Event):void
+			{ 
+				var newEvent:FiltersListItemEvent = new FiltersListItemEvent(FiltersListItemEvent.REMOVE, true);
+				newEvent.item = listData;
+				dispatchEvent(newEvent);
+			}
+			
+			private function onEditClick(event:Event):void
+			{ 
+				var newEvent:FiltersListItemEvent = new FiltersListItemEvent(FiltersListItemEvent.EDIT, true);
+				newEvent.item = listData;
+				dispatchEvent(newEvent);
+			}
+			
+			private function onShowClick(event:Event):void
+			{ 
+				var newEvent:FiltersListItemEvent = new FiltersListItemEvent(FiltersListItemEvent.SHOW, true);
+				newEvent.item = listData;
+				dispatchEvent(newEvent);
+			}
 		]]>
 	</mx:Script>
 	<mx:Canvas width="100%" height="100%">
@@ -81,18 +107,28 @@
 		<mx:Canvas right="5" height="100%">
 			<mx:HBox horizontalAlign="right" height="100%" verticalAlign="middle">
 				<mx:Button
+					id="removeButton"
+					icon="{RemoveIcon}"
+					fontWeight="normal"
+					width="26"
+					visible="{listData.removable}"
+					includeInLayout="{removeButton.visible}"
+					click="onRemoveClick(event)"/>
+				<mx:Button
 					id="editButton"
 					label="Edit"
 					fontWeight="normal"
 					visible="{listData.editable}"
-					includeInLayout="{editButton.visible}"/>
+					includeInLayout="{editButton.visible}"
+					click="onEditClick(event)"/>
 				<mx:Button 
 					id="showButton" 
 					label="Show" 
 					fontWeight="normal"
 					visible="{!listData.isCurrent}" 
 					enabled="{listData.status != ProcessingListItem.IN_PROCESS}"
-					includeInLayout="{showButton.visible}"/>
+					includeInLayout="{showButton.visible}"
+					click="onShowClick(event)"/>
 				<mx:Label 
 					id="isCurrentLabel" 
 					text="current" 

@@ -10,9 +10,11 @@
 	paddingRight="5"
 	paddingBottom="5"
 	paddingLeft="5"
-	>
+	xmlns:filters="ru.dmvow.control.filters.*" xmlns:filtersList="ru.dmvow.view.sidePanels.filtersList.*">
 	<mx:Script>
 		<![CDATA[
+			import mx.events.DragEvent;
+			import mx.collections.ArrayCollection;
 			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilterEvent;
 			import mx.managers.PopUpManager;
 			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
@@ -35,22 +37,35 @@
 				return _model;
 			}
 			
+			private function showEditItemsFilter(item:ItemsFilterItem = null):void
+			{
+				editItemsFilter.newFilter = (item == null);
+				if (item)
+					editItemsFilter.itemsFilterItem = item;
+				
+				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
+				editItemsFilter.items = model.data.dataModel.modelItems;
+				
+				PopUpManager.addPopUp(editItemsFilter, DMVoW.instance, true);
+				PopUpManager.centerPopUp(editItemsFilter);
+			}
+			
 			private function onCreationComplete(event:Event):void
 			{
 				list.itemRenderer = new ClassFactory(FiltersListRenderer);
 				
 				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
 				editItemsFilter.addEventListener(EditItemsFilterEvent.CANCEL, onEditItemsFilterCancel, false, 0, true);
+				
+				// Events, that are bubbled from the list items
+				addEventListener(FiltersListItemEvent.REMOVE, onItemRemove, false, 0, true);
+				addEventListener(FiltersListItemEvent.EDIT, onItemEdit, false, 0, true);
+				addEventListener(FiltersListItemEvent.SHOW, onItemShow, false, 0, true);
 			}
 			
 			private function onAddItemsFilter(event:Event):void
 			{
-				editItemsFilter.newFilter = true;
-				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
-				editItemsFilter.items = model.data.dataModel.modelItems;
-				
-				PopUpManager.addPopUp(editItemsFilter, DMVoW.instance, true);
-				PopUpManager.centerPopUp(editItemsFilter);
+				showEditItemsFilter();
 			}
 			
 			// model.processingList.addItem(editItemsFilter.itemsFilterItem);
@@ -70,9 +85,29 @@
 				if (editItemsFilter.newFilter)
 					model.processingList.removeItemAt(model.processingList.length - 1);
 			}
+			
+			private function onItemRemove(event:FiltersListItemEvent):void
+			{
+				var collection:ArrayCollection = (list.dataProvider as ArrayCollection);
+				var index:Number = collection.getItemIndex(event.item);
+				collection.removeItemAt(index);
+			}
+			
+			private function onItemEdit(event:FiltersListItemEvent):void
+			{
+				if (event.item is ItemsFilterItem)
+				{
+					showEditItemsFilter(event.item as ItemsFilterItem);
+				}
+			}
+			
+			private function onItemShow(event:FiltersListItemEvent):void
+			{
+				
+			}
 		]]>
 	</mx:Script>
-	<mx:List id="list" dataProvider="{model.processingList}" width="100%" rowHeight="32"/>
+	<filtersList:SpecificList id="list" dataProvider="{model.processingList}" width="100%" rowHeight="32" dragEnabled="true" dropEnabled="true" dragMoveEnabled="true"/>
 	<mx:Button label="Add rule content filter" click="onAddItemsFilter(event)"/>
-	<control:FiltersListController model="{model}"/>
+	<filters:FiltersListController model="{model}"/>
 </mx:Panel>

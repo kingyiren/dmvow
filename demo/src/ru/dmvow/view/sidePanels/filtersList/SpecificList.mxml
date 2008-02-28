@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:List xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
+			
+			override protected function dragStartHandler(event:DragEvent):void
+			{
+				if (selectedIndex != 0)
+					super.dragStartHandler(event);
+			}
+			
+			override protected function dragOverHandler(event:DragEvent):void
+		    {
+		        if (calculateDropIndex(event) > 0)
+		        {
+		        	super.dragOverHandler(event);
+		        }
+		        else
+		        {
+		        	hideDropFeedback(event);
+        
+        			DragManager.showFeedback(DragManager.NONE);
+		        }
+		    }
+		]]>
+	</mx:Script>
+</mx:List>
