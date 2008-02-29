@@ -172,9 +172,30 @@ package ru.dmvow.model.pmml.models.associationModel
 			return null;
 		}
 		
+		public function clone():IDataModel
+		{
+			var result:PMMLAssociationModel = new PMMLAssociationModel();
+			
+			result.items = new ArrayCollection(items.source.concat());
+			result.itemsets = new ArrayCollection(itemsets.source.concat());
+			result.associationRules = new ArrayCollection(associationRules.source.concat());
+			
+			return result;
+		}
+		
 		public function get modelItems():ArrayCollection
 		{
 			return items;
+		}
+		
+		public function get modelItemsets():ArrayCollection
+		{
+			return itemsets;
+		}
+		
+		public function get modelRules():ArrayCollection
+		{
+			return associationRules;
 		}
 	}
 }

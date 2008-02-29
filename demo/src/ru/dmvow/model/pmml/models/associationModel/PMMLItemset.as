@@ -2,6 +2,7 @@ package ru.dmvow.model.pmml.models.associationModel
 {
 	import mx.collections.ArrayCollection;
 	
+	import ru.dmvow.model.common.IItemset;
 	import ru.dmvow.model.pmml.common.Extendable;
 	
 	/**
@@ -21,7 +22,7 @@ package ru.dmvow.model.pmml.models.associationModel
 	 * </code>
 	 * </p>
 	 */
-	public class PMMLItemset extends Extendable
+	public class PMMLItemset extends Extendable implements IItemset
 	{
 		/**
 		 * Array of PMMLItem objects. Can be empty. We parse ItemRef objects
@@ -44,6 +45,11 @@ package ru.dmvow.model.pmml.models.associationModel
 		public function toString():String
 		{
 			return items.toString();
+		}
+		
+		public function get itemsetItems():ArrayCollection
+		{
+			return items;
 		}
 	}
 }

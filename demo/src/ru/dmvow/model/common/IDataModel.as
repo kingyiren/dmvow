@@ -4,6 +4,9 @@ package ru.dmvow.model.common
 	
 	public interface IDataModel
 	{
+		function clone():IDataModel;
 		function get modelItems():ArrayCollection;
+		function get modelItemsets():ArrayCollection;
+		function get modelRules():ArrayCollection;
 	}
 }

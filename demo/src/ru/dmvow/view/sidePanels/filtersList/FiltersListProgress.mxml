@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	backgroundColor="0x000000"
+	backgroundAlpha="0.1"
+	mouseEnabled="false"
+	>
+	<mx:ProgressBar label="Processing progress" id="progressBar" width="80%" horizontalCenter="0" verticalCenter="0" mode="manual"/>
+	<mx:Script>
+		<![CDATA[
+			private var _progress:Number = 0;
+			
+			[Bindable]
+			public function set progress(value:Number):void
+			{
+				_progress = value;
+				
+				progressBar.setProgress(value, 1);
+			}
+			
+			public function get progress():Number
+			{
+				return _progress;
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>

@@ -1,11 +1,10 @@
 package ru.dmvow.model.sql
 {
-	import ru.dmvow.model.common.IClone;
 	import ru.dmvow.model.common.IData;
 	import ru.dmvow.model.common.IDataModel;
 	import ru.dmvow.model.sql.associationModel.SQLAssociationModel;
 	
-	public class SQL implements IClone, IData
+	public class SQL implements IData
 	{
 		/** MODEL_CATALOG */
 		[Bindable]
@@ -13,11 +12,12 @@ package ru.dmvow.model.sql
 		[Bindable]
 		public var model:SQLAssociationModel;
 		
-		public function clone():Object
+		public function clone():IData
 		{
 			var result:SQL = new SQL();
+			
 			result.catalog = catalog;
-			result.model = model.clone();
+			result.model = model.clone() as SQLAssociationModel;
 			
 			return result;
 		}
