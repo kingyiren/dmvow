@@ -72,12 +72,13 @@ package ru.dmvow.model.sql.associationModel
 			return null;
 		}
 		
-		public function clone():SQLAssociationModel
+		public function clone():IDataModel
 		{
 			var result:SQLAssociationModel = new SQLAssociationModel();
 			
-			// TODO
-			//result.name =
+			result.items = new ArrayCollection(items.source.concat());
+			result.itemsets = new ArrayCollection(itemsets.source.concat());
+			result.associationRules = new ArrayCollection(associationRules.source.concat());
 			
 			return result; 
 		}
@@ -85,6 +86,16 @@ package ru.dmvow.model.sql.associationModel
 		public function get modelItems():ArrayCollection
 		{
 			return items;
+		}
+		
+		public function get modelItemsets():ArrayCollection
+		{
+			return itemsets;
+		}
+		
+		public function get modelRules():ArrayCollection
+		{
+			return associationRules;
 		}
 		
 		/*public function getAssociationRuleById(id:String):SQLAssociationRule

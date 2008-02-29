@@ -2,7 +2,9 @@ package ru.dmvow.model.sql.associationModel
 {
 	import mx.collections.ArrayCollection;
 	
-	public class SQLItemset
+	import ru.dmvow.model.common.IItemset;
+	
+	public class SQLItemset implements IItemset
 	{
 		/**
 		 * Array of SQLItem objects. Can not be empty. 
@@ -17,6 +19,11 @@ package ru.dmvow.model.sql.associationModel
 		public function toString():String
 		{
 			return items.toString();
+		}
+		
+		public function get itemsetItems():ArrayCollection
+		{
+			return items;
 		}
 	}
 }

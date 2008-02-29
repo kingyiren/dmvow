@@ -8,6 +8,11 @@ import ru.dmvow.model.view.processingList.items.ProcessingListItemEvent;
 
 public class ProcessingList extends ArrayCollection
 {
+	[Bindable]
+	public var working:Boolean = false;
+	[Bindable]
+	public var progress:Number = 0;
+	
 	public function ProcessingList(source:Array=null)
 	{
 		super(source);
