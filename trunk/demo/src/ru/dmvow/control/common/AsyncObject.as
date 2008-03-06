@@ -17,7 +17,6 @@ package ru.dmvow.control.common
 		
 		protected var timer:Timer;
 		protected var counter:Number;
-		protected var iterationsPerFrame:Number = ITERATIONS_PER_FRAME;
 		protected var maxCounter:Number;
 		
 		public function AsyncObject()
@@ -103,6 +102,11 @@ package ru.dmvow.control.common
 			var k:Number = 1000;
 			var progressEvent:ProgressEvent = new ProgressEvent(ProgressEvent.PROGRESS, false, false, value * k, 1 * k);
 			dispatchEvent(progressEvent);
+		}
+		
+		protected function get iterationsPerFrame():Number
+		{
+			return ITERATIONS_PER_FRAME;
 		}
 	}
 }

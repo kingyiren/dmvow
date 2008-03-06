@@ -5,6 +5,7 @@ package ru.dmvow.control.dataNet.builders
 	import flash.events.EventDispatcher;
 	
 	import ru.dmvow.model.DataModel;
+	import ru.dmvow.model.common.IData;
 	import ru.dmvow.model.pmml.PMMLMiningModel;
 	import ru.dmvow.model.sql.SQLMiningModel;
 	import ru.dmvow.model.view.dataNet.DataNet;
@@ -33,12 +34,12 @@ package ru.dmvow.control.dataNet.builders
 		/**
 		 * Returns Array of PreParseDataNet objects
 		 */
-		public function getAvailableDataNets(data:DataModel):Array
+		public function getAvailableDataNets(data:IData):Array
 		{
 			var result:Array = new Array();
 			var item:PreBuildDataNet; 
-			if (data.source == DataModel.FROM_PMML)
-			{
+			//if (data.source == DataModel.FROM_PMML)
+			//{
 				item = new PreBuildDataNet();
 				item.data = data;
 				item.viewType = PreBuildDataNet.ITEMS_VIEW;
@@ -48,7 +49,7 @@ package ru.dmvow.control.dataNet.builders
 				item.data = data;
 				item.viewType = PreBuildDataNet.RULES_VIEW;
 				result.push(item);
-			}
+			/*}
 			else if (data.source == DataModel.FROM_SQL)
 			{
 				item = new PreBuildDataNet();
@@ -60,7 +61,7 @@ package ru.dmvow.control.dataNet.builders
 				item.data = data;
 				item.viewType = PreBuildDataNet.RULES_VIEW;
 				result.push(item);
-			}
+			}*/
 			
 			return result;
 		}
@@ -68,24 +69,24 @@ package ru.dmvow.control.dataNet.builders
 		public function build(preParseDataNet:PreBuildDataNet):void
 		{
 			var result:DataNet;
-			if (preParseDataNet.data.source == DataModel.FROM_PMML)
-			{
+			//if (preParseDataNet.data.source == DataModel.FROM_PMML)
+			//{
 				targetBuilder = pmmlBuilder;
 				if (preParseDataNet.viewType == PreBuildDataNet.ITEMS_VIEW)
 				{
 					pmmlBuilder.createItemsNet(
-						(preParseDataNet.data as PMMLMiningModel).pmmlData.models[0]);
+						(preParseDataNet.data).dataModel);
 				}
 				else if (preParseDataNet.viewType == PreBuildDataNet.RULES_VIEW)
 				{
 					pmmlBuilder.createRulesNet(
-						(preParseDataNet.data as PMMLMiningModel).pmmlData.models[0]);
+						(preParseDataNet.data).dataModel);
 				}
 				else
 				{
 					reportError();
 				}
-			}
+			/*}
 			else if (preParseDataNet.data.source == DataModel.FROM_SQL)
 			{
 				targetBuilder = sqlBuilder;
@@ -107,7 +108,7 @@ package ru.dmvow.control.dataNet.builders
 			else
 			{
 				reportError();
-			}
+			}*/
 		}
 		
 		protected function onBuilderComplete(event:Event):void

@@ -27,6 +27,7 @@
 			
 			private var _listIcon:UIMovieClip;
 			private var _listData:ProcessingListItem;
+			private var _status:String;
 			
 			[Bindable]
 			public function set listData(value:ProcessingListItem):void
@@ -39,6 +40,19 @@
 			public function get listData():ProcessingListItem
 			{
 				return _listData;
+			}
+			
+			[Bindable]
+			public function set status(value:String):void
+			{
+				_status = value;
+				
+				listIcon = getIconClass();
+			}
+			
+			public function get status():String
+			{
+				return _status;
 			}
 			
 			private function set listIcon(value:Class):void
@@ -73,6 +87,7 @@
 			private function onCreationComplete(event:Event):void
 			{
 				BindingUtils.bindProperty(this, "listData", this, "data");
+				BindingUtils.bindProperty(this, "status", this, ["listData", "status"]);
 			}
 			
 			private function onRemoveClick(event:Event):void

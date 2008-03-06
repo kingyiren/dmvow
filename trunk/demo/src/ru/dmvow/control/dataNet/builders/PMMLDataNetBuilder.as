@@ -1,6 +1,7 @@
 package ru.dmvow.control.dataNet.builders
 {
-	import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationModel;
+	import ru.dmvow.model.common.IDataModel;
+	import ru.dmvow.model.common.IRule;
 	import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationRule;
 	import ru.dmvow.model.view.dataNet.DataNet;
 	import ru.dmvow.model.view.dataNet.NetLink;
@@ -11,16 +12,16 @@ package ru.dmvow.control.dataNet.builders
 		protected static const ITEMS:String = "items";
 		protected static const RULES:String = "rules";
 		protected var parseType:String;
-		protected var fromModel:PMMLAssociationModel;
+		protected var fromModel:IDataModel;
 		
-		public function createItemsNet(fromModel:PMMLAssociationModel):void
+		public function createItemsNet(fromModel:IDataModel):void
 		{
 			this.fromModel = fromModel;
 			parseType = ITEMS;
 			startProcess();
 		}
 		
-		public function createRulesNet(fromModel:PMMLAssociationModel):void
+		public function createRulesNet(fromModel:IDataModel):void
 		{
 			this.fromModel = fromModel;
 			parseType = RULES;
@@ -54,31 +55,31 @@ package ru.dmvow.control.dataNet.builders
 			var k:Number;
 			var node:NetNode;
 			result = new DataNet();
-			for (i = 0; i < fromModel.items.length; i++)
+			for (i = 0; i < fromModel.modelItems.length; i++)
 			{
 				node = new NetNode();
-				node.data = fromModel.items[i];
+				node.data = fromModel.modelItems[i];
 				result.nodes.push(node);
 			}
 			
-			maxCounter = fromModel.associationRules.length;
+			maxCounter = fromModel.modelRules.length;
 		}
 		
 		protected function itemsProcessIteration():void
 		{
 			var j:Number;
 			var k:Number;
-			var rule:PMMLAssociationRule = fromModel.associationRules[counter];
+			var rule:IRule = fromModel.modelRules[counter];
 			var aNode:NetNode;
 			var cNode:NetNode;
 			var link:NetLink;
 			 
-			for (j = 0; j < rule.antecedent.items.length; j++)
+			for (j = 0; j < rule.ruleAntecedent.itemsetItems.length; j++)
 			{
-				aNode = getNetNodeByData(rule.antecedent.items[j]); 
-				for (k = 0; k < rule.consequent.items.length; k++)
+				aNode = getNetNodeByData(rule.ruleAntecedent.itemsetItems[j]); 
+				for (k = 0; k < rule.ruleConsequent.itemsetItems.length; k++)
 				{
-					cNode = getNetNodeByData(rule.consequent.items[k]);
+					cNode = getNetNodeByData(rule.ruleConsequent.itemsetItems[k]);
 					link = getNetLink(aNode, cNode);
 					link.causedBy.push(rule);
 				}
@@ -92,27 +93,27 @@ package ru.dmvow.control.dataNet.builders
 			var k:Number;
 			var node:NetNode;
 			result = new DataNet();
-			for (i = 0; i < fromModel.itemsets.length; i++)
+			for (i = 0; i < fromModel.modelItemsets.length; i++)
 			{
 				node = new NetNode();
-				node.data = fromModel.itemsets[i];
+				node.data = fromModel.modelItemsets[i];
 				result.nodes.push(node);
 			}
 			
-			maxCounter = fromModel.associationRules.length;
+			maxCounter = fromModel.modelRules.length;
 		}
 		
 		protected function rulesProcessIteration():void
 		{
 			var j:Number;
 			var k:Number;
-			var rule:PMMLAssociationRule = fromModel.associationRules[counter];
+			var rule:IRule = fromModel.modelRules[counter];
 			var aNode:NetNode;
 			var cNode:NetNode;
 			var link:NetLink;
 			 
-			aNode = getNetNodeByData(rule.antecedent);
-			cNode = getNetNodeByData(rule.consequent); 
+			aNode = getNetNodeByData(rule.ruleAntecedent);
+			cNode = getNetNodeByData(rule.ruleConsequent); 
 			link = getNetLink(aNode, cNode);
 			link.causedBy.push(rule);
 		}

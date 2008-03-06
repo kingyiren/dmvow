@@ -27,6 +27,7 @@ public class ProcessingListItem extends EventDispatcher
 	public static const NOT_VALID:String = "notValid"; 
 	
 	// PMML or SQL object.
+	[Bindable]
 	public var data:IData;
 	protected var _status:String = EMPTY;
 	protected var _isCurrent:Boolean = false;
@@ -145,7 +146,7 @@ public class ProcessingListItem extends EventDispatcher
 		
 		if (_status == VALID)
 		{
-			if (!processingHistory.equalTo(processingData))
+ 			if (!processingHistory.equalTo(processingData))
 				processingHistory = processingData.clone();
 		}
 	}

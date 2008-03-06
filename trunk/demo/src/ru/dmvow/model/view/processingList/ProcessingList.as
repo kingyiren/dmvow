@@ -12,6 +12,8 @@ public class ProcessingList extends ArrayCollection
 	public var working:Boolean = false;
 	[Bindable]
 	public var progress:Number = 0;
+	[Bindable]
+	public var selectedItem:ProcessingListItem;
 	
 	public function ProcessingList(source:Array=null)
 	{
