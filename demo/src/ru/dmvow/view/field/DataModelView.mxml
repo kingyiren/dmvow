@@ -9,6 +9,7 @@
 	<!-- Содержимое таб-навигатора -->
 	<mx:Script>
 		<![CDATA[
+			import ru.dmvow.model.common.IData;
 			import ru.dmvow.control.dataNet.builders.DataNetBuilders;
 			import ru.dmvow.view.common.MessageView;
 			import mx.controls.Label;
@@ -16,19 +17,19 @@
 			import ru.dmvow.view.field.dataNet.DataNetView;
 			import ru.dmvow.model.DataModel;
 			
-			protected var _model:DataModel;
+			protected var _model:IData;
 			protected var dataNetBuilders:DataNetBuilders;
 			protected var _availableNets:Array;
 			protected var children:Array;
 			protected var emptyView:MessageView;
 			
 			[Bindable]
-			public function get model():DataModel
+			public function get model():IData
 			{
 				return _model;
 			}
 			
-			public function set model(value:DataModel):void
+			public function set model(value:IData):void
 			{
 				for each (var view:DataNetView in children)
 					if (view.active)

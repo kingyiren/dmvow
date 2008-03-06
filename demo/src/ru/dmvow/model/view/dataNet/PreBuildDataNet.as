@@ -1,6 +1,6 @@
 package ru.dmvow.model.view.dataNet
 {
-	import ru.dmvow.model.DataModel;
+	import ru.dmvow.model.common.IData;
 	
 	public class PreBuildDataNet
 	{
@@ -8,7 +8,7 @@ package ru.dmvow.model.view.dataNet
 		public static const RULES_VIEW:String = "rules_view";
 		
 		public var viewType:String;
-		public var data:DataModel;
+		public var data:IData;
 		
 		public function get viewTitle():String
 		{

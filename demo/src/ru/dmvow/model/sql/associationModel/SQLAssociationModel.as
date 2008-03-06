@@ -76,6 +76,17 @@ package ru.dmvow.model.sql.associationModel
 		{
 			var result:SQLAssociationModel = new SQLAssociationModel();
 			
+			result.itemsetCount = itemsetCount;
+			result.ruleCount = ruleCount;
+			result.maxItemsetSize = maxItemsetSize;
+			result.maxLift = maxLift;
+			result.maxProbability = maxProbability;
+			result.maxSupport = maxSupport;
+			result.minItemsetSize = maxItemsetSize;
+			result.minLift = minLift;
+			result.minProbability = minProbability;
+			result.minSupport = minSupport;
+			result.name = name;
 			result.items = new ArrayCollection(items.source.concat());
 			result.itemsets = new ArrayCollection(itemsets.source.concat());
 			result.associationRules = new ArrayCollection(associationRules.source.concat());

@@ -22,7 +22,6 @@
 			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilterEvent;
 			import mx.managers.PopUpManager;
 			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
-			import ru.dmvow.control.filters.ItemsFilter;
 			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilter;
 			import ru.dmvow.model.DataModel;
 			

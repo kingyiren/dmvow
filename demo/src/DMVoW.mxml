@@ -44,7 +44,7 @@
 			<interestingMeasures:InterestingMeasures id="interestingMeasures" width="100%" interestingMeasures="{model.interestingMeasures}"/>
 			<filtersList:FiltersList id="filtersList" width="100%" model="{model.selectedModel}" visible="{model.selectedModel != null}" />
 		</mx:VBox>
-		<field:DataModelView id="dataModelView" model="{model.selectedModel}"/>
+		<field:DataModelView id="dataModelView" model="{model.selectedModel.processingList.selectedItem.data}"/>
 	</mx:HDividedBox>
 	
 	<!-- Контроллер -->
