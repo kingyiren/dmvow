@@ -199,9 +199,9 @@ public class ProcessingListItem extends EventDispatcher
 				else
 				{
 					if (_inProcess)
-						status = NOT_VALID;
-					else
 						status = IN_PROCESS;
+					else
+						status = NOT_VALID;
 				}
 			}
 			else

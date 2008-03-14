@@ -27,5 +27,15 @@ public class SQLAssociationRule implements IRule
 	{
 		return consequent;
 	}
+	
+	public function get ruleConfidence():Number
+	{
+		return confidence;
+	}
+	
+	public function get ruleSupport():Number
+	{
+		return support;
+	}
 }
 }

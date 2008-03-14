@@ -42,12 +42,12 @@ package ru.dmvow.control.dataNet.builders
 			//{
 				item = new PreBuildDataNet();
 				item.data = data;
-				item.viewType = PreBuildDataNet.ITEMS_VIEW;
+				item.viewType = PreBuildDataNet.RULES_VIEW;
 				result.push(item);
-				
+			
 				item = new PreBuildDataNet();
 				item.data = data;
-				item.viewType = PreBuildDataNet.RULES_VIEW;
+				item.viewType = PreBuildDataNet.ITEMS_VIEW;
 				result.push(item);
 			/*}
 			else if (data.source == DataModel.FROM_SQL)

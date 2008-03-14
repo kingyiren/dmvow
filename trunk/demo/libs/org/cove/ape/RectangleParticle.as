@@ -133,7 +133,7 @@ package org.cove.ape {
 				sprite.graphics.clear();
 				sprite.graphics.lineStyle(lineThickness, lineColor, lineAlpha);
 				sprite.graphics.beginFill(fillColor, fillAlpha);
-				sprite.graphics.drawRect(-w/2, -h/2, w, h);
+				sprite.graphics.drawRoundRect(-w/2, -h/2, w, h, 6, 6);
 				sprite.graphics.endFill();
 			}
 			paint();

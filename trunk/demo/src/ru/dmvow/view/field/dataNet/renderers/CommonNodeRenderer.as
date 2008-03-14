@@ -53,18 +53,18 @@ package ru.dmvow.view.field.dataNet.renderers
 			textField.selectable = false;
 			textField.autoSize = TextFieldAutoSize.LEFT;
 			textField.text = netNode.toString();
-			textField.embedFonts = true;
+			//textField.embedFonts = true;
 			
-			var textFormat:TextFormat = new TextFormat("mainFont");
-			textField.setTextFormat(textFormat);
+			//var textFormat:TextFormat = new TextFormat("mainFont");
+			//textField.setTextFormat(textFormat);
 			
 			textField.x = (- textField.width)/2;
 			textField.y = (- textField.height)/2;
 			width = textField.width + 10;
 			height = textField.height + 10;
 			
-			setFill(0xDDDDDD, 0.8);
-			setLine(0, 0xAAAAAA, 0);
+			setFill(0xFFFFFF, 0.9);
+			setLine(0, 0xAAAAAA, 1);
 			
 			sprite.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			if (sprite.stage)
@@ -88,7 +88,7 @@ package ru.dmvow.view.field.dataNet.renderers
 				sprite.graphics.clear();
 				sprite.graphics.lineStyle(lineThickness, lineColor, lineAlpha);
 				sprite.graphics.beginFill(fillColor, fillAlpha);
-				sprite.graphics.drawRect(-w/2, -h/2, w, h);
+				sprite.graphics.drawRoundRect(-w/2, -h/2, w, h, 9, 9);
 				sprite.graphics.endFill();
 			}
 			paint();

@@ -8,8 +8,10 @@ package ru.dmvow.view.field.dataNet.renderers
 	{
 		protected var DEFAULT_REST_LENGTH:Number = 200;
 		
-		public function CommonLinkRenderer(p1:AbstractParticle, p2:AbstractParticle, stiffness:Number=0.0, collidable:Boolean=false, rectHeight:Number=1, rectScale:Number=1, scaleToLength:Boolean=false)
+		public function CommonLinkRenderer(p1:AbstractParticle, p2:AbstractParticle, lineThickness:Number = 1, stiffness:Number=0.0, collidable:Boolean=false, rectHeight:Number=1, rectScale:Number=1, scaleToLength:Boolean=false)
 		{
+			this.lineThickness = lineThickness; 
+			
 			super(p1, p2, stiffness, collidable, rectHeight, rectScale, scaleToLength);
 			
 			restLength = DEFAULT_REST_LENGTH;

@@ -140,13 +140,14 @@
 					id="showButton" 
 					label="Show" 
 					fontWeight="normal"
-					visible="{!listData.isCurrent}" 
+					visible="{!listData.isCurrent || !(listData.status == ProcessingListItem.VALID || listData.status == ProcessingListItem.EMPTY)}" 
 					enabled="{listData.status != ProcessingListItem.IN_PROCESS}"
 					includeInLayout="{showButton.visible}"
 					click="onShowClick(event)"/>
 				<mx:Label 
 					id="isCurrentLabel" 
 					text="current" 
+					width="{showButton.width}"
 					visible="{listData.isCurrent}"
 					includeInLayout="{isCurrentLabel.visible}"/>
 			</mx:HBox>

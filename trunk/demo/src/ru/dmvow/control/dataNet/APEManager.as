@@ -36,7 +36,7 @@ package ru.dmvow.control.dataNet
 			checkInitialization();
 			
 			if (showing)
-				throw new Error("APEManager is already showing something.");
+				hide();
 			
 			showing = true;
 			
@@ -44,12 +44,16 @@ package ru.dmvow.control.dataNet
 			APEngine.container = target.container;
 			particles = new Array();
 			springs = new Array();
+			var totalItems:Number = 0;
 			for each (group in target.groups)
 			{
+				totalItems += group.constraints.length;
 				for each (var spring:SpringConstraint in group.constraints)
 				{
 					springs.push(spring);
 				}
+				
+				totalItems += group.particles.length;
 				for each (var particle:AbstractParticle in group.particles)
 				{
 					particles.push(particle);
@@ -62,7 +66,10 @@ package ru.dmvow.control.dataNet
 				AlignEngine.align(target);
 			}
 			
-			timer.start();
+			if (totalItems < 100)
+				timer.start();
+			APEngine.step(false);
+			APEngine.paint();
 		}
 		
 		public static function pause():void
@@ -93,7 +100,7 @@ package ru.dmvow.control.dataNet
 			}
 		}
 		
-		public static function hide(target:DataNetView):void
+		public static function hide():void
 		{
 			// TODO: remove from engine and stop engine
 			if (showing)

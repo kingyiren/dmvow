@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	creationComplete="onCreationComplete(event)"
+	>
+	<mx:Metadata>
+		[Event(name="browse", type="ru.dmvow.view.sidePanels.loadedModels.FileSelectorEvent")]
+		[Event(name="localPathLoad", type="ru.dmvow.view.sidePanels.loadedModels.FileSelectorEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			public static const LOCAL:String = "local";
+			public static const NET:String = "net";
+		
+			public function get localPath():String
+			{
+				return textInput.text;
+			}
+		
+			private function onCreationComplete(event:Event):void
+			{
+				if (Security.sandboxType == Security.LOCAL_TRUSTED || 
+					Security.sandboxType == Security.LOCAL_WITH_FILE)
+				{
+					currentState = LOCAL;
+				} 
+				else
+				{
+					currentState = NET;
+				}
+			}
+			
+			private function onLoadButtonClick(event:Event):void
+			{
+				var newEvent:FileSelectorEvent = new FileSelectorEvent(FileSelectorEvent.LOCAL_PATH_LOAD);
+				dispatchEvent(newEvent);
+			}
+			
+			private function onBrowseButtonClick(event:Event):void
+			{
+				var newEvent:FileSelectorEvent = new FileSelectorEvent(FileSelectorEvent.BROWSE);
+				dispatchEvent(newEvent);
+			}
+		]]>
+	</mx:Script>
+	<mx:states>
+		<mx:State name="{LOCAL}">
+			<mx:AddChild>
+				<mx:Label text="From local file:"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:TextInput width="100%" id="textInput" text="data\ssas-dump-size2.txt"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:Button id="loadButton" label="Load" click="onLoadButtonClick(event)"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{NET}">
+			<mx:AddChild>
+				<mx:Label text="From local file:"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:Button id="browseButton" label="Browse" click="onBrowseButtonClick(event)"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+</mx:HBox>

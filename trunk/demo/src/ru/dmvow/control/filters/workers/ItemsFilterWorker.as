@@ -28,10 +28,6 @@ public class ItemsFilterWorker extends AbstractWorker
 	private var currentTarget:String;
 	private var rulesLength:Number;
 	private var rulesToDelete:Array = new Array();
-	private var itemsetsLength:Number;
-	private var itemsetsToDelete:Array = new Array();
-	private var itemsLength:Number;
-	private var itemsToDelete:Array = new Array();
 	
 	public function ItemsFilterWorker()
 	{
@@ -51,20 +47,18 @@ public class ItemsFilterWorker extends AbstractWorker
 		// Actions in the beginning of the process
 		// Have to set "maxCounter" here
 		rulesLength = previousStepData.dataModel.modelRules.length;
-		itemsetsLength = previousStepData.dataModel.modelItemsets.length;
-		itemsLength = previousStepData.dataModel.modelItems.length;
 		
 		// For rules we will collect indexes to delete through "rulesLength"
 		// iterations and then delete them in "rulesLength + 1" iteration.
 		// The same thing with itemsets and items. 
-		maxCounter = rulesLength + 1 + itemsetsLength + 1 + itemsLength + 1;
+		maxCounter = rulesLength + 1 + 1 + 1;
 		
 		// Starting with processing rules.
 		currentTarget = RULES; 
 		
 		iData = previousStepData.clone();
 	}  
-		
+	
 	override protected function reportComplete():void
 	{
 		itemsFilterItem.data = iData;
@@ -80,12 +74,15 @@ public class ItemsFilterWorker extends AbstractWorker
 		// User "counter" to get current index.
 		if (currentTarget == RULES)
 		{
+			if (counter == rulesLength - 1)
+				currentTarget = RULES_REMOVE;
+			
+			if (rulesLength == 0)
+				return;
+			
 			// Work on rules
 			if (haveToDeleteRule(iData.dataModel.modelRules.source[counter]))
 				rulesToDelete.push(counter);
-			
-			if (counter == rulesLength - 1)
-				currentTarget = RULES_REMOVE;
 		}
 		else if (currentTarget == RULES_REMOVE)
 		{
@@ -94,40 +91,16 @@ public class ItemsFilterWorker extends AbstractWorker
 				iData.dataModel.modelRules.source.splice(rulesToDelete[i], 1);
 			}
 			
-			currentTarget = ITEMSETS;
-		}
-		else if (currentTarget == ITEMSETS)
-		{
-			localCounter = counter - rulesLength - 1;
-			if (haveToDeleteItemset(iData.dataModel.modelItemsets.source[localCounter]))
-				itemsetsToDelete.push(localCounter);
-			
-			if (localCounter == itemsetsLength - 1)
-				currentTarget = ITEMSETS_REMOVE;
+			currentTarget = ITEMSETS_REMOVE;
 		}
 		else if (currentTarget == ITEMSETS_REMOVE)
 		{
-			for (i = itemsetsToDelete.length - 1; i >= 0; i--)
-			{
-				iData.dataModel.modelItemsets.source.splice(itemsetsToDelete[i], 1);
-			}
-			currentTarget == ITEMS;
+			cleanItemsets();
+			currentTarget = ITEMS_REMOVE;
 		}
-		else if (currentTarget == ITEMS)
+		else if (currentTarget == ITEMS_REMOVE)
 		{
-			localCounter = counter - rulesLength - 1 - itemsetsLength - 1;
-			if (haveToDeleteItem(iData.dataModel.modelItems.source[localCounter]))
-				itemsToDelete.push(localCounter);
-			
-			if (localCounter == itemsLength - 1)
-				currentTarget = ITEMSETS_REMOVE;
-		}
-		else if (currentTarget == ITEMSETS_REMOVE)
-		{
-			for (i = itemsToDelete.length - 1; i >= 0; i--)
-			{
-				iData.dataModel.modelItemsets.source.splice(itemsToDelete[i], 1);
-			}
+			cleanItems();
 		}
 	} 
 	
@@ -186,18 +159,60 @@ public class ItemsFilterWorker extends AbstractWorker
 		return result;
 	}
 	
-	private function haveToDeleteItemset(rule:IItemset):Boolean
+	private function cleanItemsets():void
 	{
-		var result:Boolean = false;
+		// Go through all the rules and remove used itemsets from temp set.
+		var tempSet:Array = iData.dataModel.modelItemsets.source.concat();
+		var rulesArr:Array = iData.dataModel.modelRules.source;
+		var index:Number;
+		var rule:IRule;
+		for (var i:Number = 0; i < rulesArr.length; i++)
+		{
+			rule = rulesArr[i];
+			index = tempSet.indexOf(rule.ruleAntecedent);
+			if (index >= 0)
+				tempSet.splice(index, 1);
+			index = tempSet.indexOf(rule.ruleConsequent);
+			if (index >= 0)
+				tempSet.splice(index, 1);
+		}
 		
-		return result;	
+		var modelItemsets:Array = iData.dataModel.modelItemsets.source;
+		// Then remove itemsets from temp set from the itemsets.
+		for (i = 0; i < tempSet.length; i++)
+		{
+			index = modelItemsets.indexOf(tempSet[i]);
+			if (index >= 0)
+				modelItemsets.splice(index, 1);
+		}
 	} 
 	
-	private function haveToDeleteItem(rule:IItem):Boolean
+	private function cleanItems():void
 	{
-		var result:Boolean = false;
+		// Go through all the itemsets and remove used items from temp set.
+		var tempSet:Array = iData.dataModel.modelItems.source.concat();
+		var itemsetsArr:Array = iData.dataModel.modelItemsets.source;
+		var index:Number;
+		var itemset:IItemset;
+		for (var i:Number = 0; i < itemsetsArr.length; i++)
+		{
+			itemset = itemsetsArr[i];
+			for (var j:Number = 0; j < itemset.itemsetItems.length; j++)
+			{
+				index = tempSet.indexOf(itemset.itemsetItems.getItemAt(j));
+				if (index >= 0)
+					tempSet.splice(index, 1);
+			}
+		}
 		
-		return result;
+		var modelItems:Array = iData.dataModel.modelItems.source;
+		// Then remove itemsets from temp set from the itemsets.
+		for (i = 0; i < tempSet.length; i++)
+		{
+			index = modelItems.indexOf(tempSet[i]);
+			if (index >= 0)
+				modelItems.splice(index, 1);
+		}
 	}
 		
 	/*override protected function get iterationsPerFrame():Number

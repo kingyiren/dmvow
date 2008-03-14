@@ -211,7 +211,7 @@ public class FiltersListController extends EventDispatcher
 	private function onItemShow(event:FiltersListItemEvent):void
 	{
 		// If this item is ready to be shown - let's show it.
-		if (event.item.status == ProcessingListItem.VALID)
+		if (event.item.status == ProcessingListItem.VALID || event.item.status == ProcessingListItem.EMPTY)
 		{
 			showItem(event.item);
 		}
@@ -220,6 +220,7 @@ public class FiltersListController extends EventDispatcher
 		{
 			workersListIndex = -1;
 			_model.processingList.working = true;
+			startingData = null;
 			setProgress(0);
 			
 			// Fill the workers list
@@ -231,7 +232,7 @@ public class FiltersListController extends EventDispatcher
 				{
 					if (!startingData)
 					{
-						startingData = (_model.processingList.getItemAt(i-1) as ProcessingListItem).data;
+						startingData = (_model.processingList.getItemAt(i-1) as ProcessingListItem).data.clone();
 					}
 					
 					var workersListItem:WorkersListItem = new WorkersListItem();

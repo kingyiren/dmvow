@@ -13,7 +13,7 @@ package ru.dmvow.control.common
 	public class AsyncObject extends EventDispatcher
 	{
 		protected static const TIMER_INTERVAL:Number = 1000/24;
-		protected static const ITERATIONS_PER_FRAME:Number = 100;
+		protected static const ITERATIONS_PER_FRAME:Number = 12;
 		
 		protected var timer:Timer;
 		protected var counter:Number;
