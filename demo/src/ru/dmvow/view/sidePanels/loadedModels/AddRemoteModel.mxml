@@ -8,7 +8,7 @@
 	paddingLeft="5"
 	paddingRight="5"
 	paddingTop="5"
-	>
+	xmlns:loadedModels="ru.dmvow.view.sidePanels.loadedModels.*">
 	<mx:Script>
 		<![CDATA[
 			import com.dynamicflash.util.Base64;
@@ -22,6 +22,7 @@
 			public static const PROCESSING_STATE:String = "processing_state";
 			
 			protected var fileReference:FileReference;
+			protected var urlLoader:URLLoader;
 			protected var parser:DataModelParser;
 			
 			public function show():void
@@ -32,12 +33,19 @@
 			protected function onCreationComplete(event:Event):void
 			{
 				fileReference = new FileReference();
-				fileReference.addEventListener(Event.SELECT, fileSelect);
-				fileReference.addEventListener(Event.OPEN, uploadOpen);
-				fileReference.addEventListener(ProgressEvent.PROGRESS, uploadProgress);
-				fileReference.addEventListener(IOErrorEvent.IO_ERROR, uploadError);
-				fileReference.addEventListener(SecurityErrorEvent.SECURITY_ERROR, uploadError);
-				fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, uploadComplete);
+				fileReference.addEventListener(Event.SELECT, fileSelect, false, 0, true);
+				fileReference.addEventListener(Event.OPEN, uploadOpen, false, 0, true);
+				fileReference.addEventListener(ProgressEvent.PROGRESS, uploadProgress, false, 0, true);
+				fileReference.addEventListener(IOErrorEvent.IO_ERROR, uploadError, false, 0, true);
+				fileReference.addEventListener(SecurityErrorEvent.SECURITY_ERROR, uploadError, false, 0, true);
+				fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, uploadComplete, false, 0, true);
+				
+				urlLoader = new URLLoader();
+				urlLoader.addEventListener(Event.OPEN, uploadOpen, false, 0, true);
+				urlLoader.addEventListener(ProgressEvent.PROGRESS, uploadProgress, false, 0, true);
+				urlLoader.addEventListener(IOErrorEvent.IO_ERROR, uploadError, false, 0, true);
+				urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, uploadError, false, 0, true);
+				urlLoader.addEventListener(Event.COMPLETE, uploadComplete, false, 0, true);
 				
 				parser = new DataModelParser();
 				parser.addEventListener(Event.COMPLETE, onParserComplete);
@@ -48,6 +56,11 @@
 			protected function onBrowseButtonClick(event:Event):void
 			{
 				fileReference.browse();
+			}
+			
+			protected function onLocalPathLoad(event:Event):void
+			{
+				urlLoader.load(new URLRequest(fileSelector.localPath));
 			}
 			
 			protected function fileSelect(event:Event):void
@@ -85,11 +98,22 @@
 			
 			protected function uploadComplete(event:Event):void
 			{
-				var dataEvent:DataEvent = DataEvent(event);
+				var dataString:String;
+				if (event is DataEvent)
+				{
+					// Browse case
+					var dataEvent:DataEvent = DataEvent(event);
+					dataString = dataEvent.data;
+				}
+				else
+				{
+					// Local load case
+					dataString = urlLoader.data;
+				}
+
 				currentState = PROCESSING_STATE;
-				
 				//var data:String = Base64.decode(dataEvent.data);
-				parser.parse(dataEvent.data);
+				parser.parse(dataString);
 			}
 			
 			protected function onParserComplete(event:Event):void
@@ -119,10 +143,11 @@
 	<mx:states>
 		<mx:State name="{BROWSE_STATE}">
 			<mx:AddChild>
-				<mx:Label text="From local file:"/>
-			</mx:AddChild>
-			<mx:AddChild>
-				<mx:Button id="browseButton" label="Обзор" click="onBrowseButtonClick(event)"/>
+				<loadedModels:FileSelector 
+					id="fileSelector"
+					browse="{onBrowseButtonClick(event)}" 
+					localPathLoad="{onLocalPathLoad(event)}" 
+					width="100%"/>
 			</mx:AddChild>
 		</mx:State>
 		<mx:State name="{LOADING_STATE}">

@@ -102,7 +102,24 @@ package ru.dmvow.control.boundary.sqlParser
 			var item:SQLItem = result.model.getItemByString(string);
 			if (!item)
 			{
-				var splited:Array = string.split(" = ");
+				var splited:Array;
+				
+				if (string.indexOf("Duration >=") >= 0)
+				{
+					trace("aaa");
+				}
+				
+				if (string.indexOf(" > ") > 0)
+					splited = string.split(" > ");
+				else if (string.indexOf(" >= ") > 0)
+					splited = string.split(" >= ");
+				else if (string.indexOf(" < ") > 0)
+					splited = string.split(" < ");
+				else if (string.indexOf(" <= ") > 0)
+					splited = string.split(" <= ");
+				else if (string.indexOf(" = ") > 0)
+					splited = string.split(" = ");
+				
 				item = new SQLItem();
 				item.name = splited[0];
 				item.value = splited[1]; 

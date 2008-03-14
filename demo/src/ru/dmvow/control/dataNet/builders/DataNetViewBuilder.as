@@ -3,6 +3,7 @@ package ru.dmvow.control.dataNet.builders
 	import org.cove.ape.Group;
 	
 	import ru.dmvow.control.common.AsyncObject;
+	import ru.dmvow.model.common.IRule;
 	import ru.dmvow.model.view.dataNet.DataNet;
 	import ru.dmvow.model.view.dataNet.NetLink;
 	import ru.dmvow.model.view.dataNet.NetNode;
@@ -48,12 +49,22 @@ package ru.dmvow.control.dataNet.builders
 			var currNode:NetNode = dataNet.nodes[counter];
 			var linkRenderer:CommonLinkRenderer;
 			var currLink:NetLink;
+			var currLinkWeight:Number;
+			var rule:IRule;
 			for (var i:Number = 0; i < currNode.links.length; i++)
 			{
-				currLink = currNode.links[i]; 
+				currLink = currNode.links[i];
+				currLinkWeight = 1;
+				for (var j:Number = 0; j < currLink.causedBy.length; j++)
+				{
+					rule = currLink.causedBy[j];
+					currLinkWeight += rule.ruleConfidence * 20;
+				}
+				currLinkWeight = Math.round(currLinkWeight);
 				linkRenderer = new CommonLinkRenderer(
 					group.particles[counter], 
-					group.particles[getIndex(currLink.dest)]);
+					group.particles[getIndex(currLink.dest)],
+					currLinkWeight);
 				group.addConstraint(linkRenderer); 
 			}
 		}

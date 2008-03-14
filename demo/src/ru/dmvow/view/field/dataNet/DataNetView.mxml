@@ -55,6 +55,7 @@
 				dataNetBuilders.addEventListener(ErrorEvent.ERROR, onDataNetBuildersError);
 				
 				viewBuilder = new DataNetViewBuilder();
+				viewBuilder.addEventListener(ProgressEvent.PROGRESS, onViewBuilderProgress);
 				viewBuilder.addEventListener(Event.COMPLETE, onViewBuilderComplete); 
 				viewBuilder.addEventListener(ErrorEvent.ERROR, onViewBuilderError);
 				
@@ -137,7 +138,7 @@
 				if (_active)
 				{
 					_active = false;
-					APEManager.hide(this);
+					APEManager.hide();
 					
 					dispatchEvent(new DataNetViewEvent(DataNetViewEvent.DEACTIVATE));
 				}
@@ -177,6 +178,11 @@
 			protected function onDataNetBuildersError(event:Event):void
 			{
 				currentState = ERROR_STATE;
+			}
+			
+			protected function onViewBuilderProgress(event:ProgressEvent):void
+			{
+				buildingProgressBar.setProgress(event.bytesLoaded, event.bytesTotal);
 			}
 			
 			protected function onViewBuilderComplete(event:Event):void
@@ -267,7 +273,12 @@
 		</mx:State>
 		<mx:State name="{BUILDING_VIEW_STATE}">
 			<mx:AddChild>
-				<common:MessageView label="Building view..."/>
+				<mx:Canvas width="200" horizontalCenter="0" verticalCenter="0">
+					<mx:VBox width="100%" horizontalAlign="center">
+						<common:MessageView label="Building view..." id="buildingLabel"/>
+						<mx:ProgressBar id="buildingProgressBar" mode="manual" label=""/>
+					</mx:VBox>
+				</mx:Canvas>
 			</mx:AddChild>
 		</mx:State>
 		<mx:State name="{VIEW_STATE}">

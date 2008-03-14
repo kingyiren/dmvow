@@ -4,5 +4,7 @@ public interface IRule
 {
 	function get ruleAntecedent():IItemset;
 	function get ruleConsequent():IItemset;
+	function get ruleConfidence():Number;
+	function get ruleSupport():Number;
 }
 }
