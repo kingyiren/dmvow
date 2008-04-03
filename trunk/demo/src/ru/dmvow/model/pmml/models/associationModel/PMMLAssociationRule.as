@@ -30,11 +30,13 @@ public class PMMLAssociationRule extends Extendable implements IRule
 	/** Required. Some PMMLItemset object. */
 	public var consequent:PMMLItemset;
 	/** Required. In [0, 1]. */
-	public var support:Number;
+	public var support:Number = -1;
 	/** Required. In [0, 1]. */
-	public var confidence:Number;
+	public var confidence:Number = -1;
 	/** Optional. In [0, 1]. */
-	public var lift:Number;
+	public var lift:Number = -1;
+	public var leverage:Number = -1;
+	public var coverage:Number = -1;
 	/** Optional. */
 	public var id:String;
 	
@@ -61,6 +63,36 @@ public class PMMLAssociationRule extends Extendable implements IRule
 	public function get ruleSupport():Number
 	{
 		return support;
+	}
+	
+	public function get ruleCoverage():Number
+	{
+		return coverage;
+	}
+	
+	public function set ruleCoverage(value:Number):void
+	{
+		coverage = value;
+	}
+	
+	public function get ruleLeverage():Number
+	{
+		return leverage;
+	}
+	
+	public function set ruleLeverage(value:Number):void
+	{
+		leverage = value;
+	}
+	
+	public function get ruleLift():Number
+	{
+		return lift;
+	}
+	
+	public function set ruleLift(value:Number):void
+	{
+		lift = value;
 	}
 }
 }

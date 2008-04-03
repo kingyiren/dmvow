@@ -8,38 +8,29 @@
 	paddingRight="5"
 	paddingBottom="5"
 	paddingLeft="5"
+	width="700"
 	>
-	<mx:HBox borderThickness="0">
-		<mx:VBox>
-			<mx:Label text="New measure" fontWeight="bold"/>
-			<mx:List
-				id="targetList" 
-				width="200" 
-				alternatingItemColors="[0xf0f0f0, 0xf5f5f5]"  
-				allowMultipleSelection="true"
-				dropEnabled="true"
-				dragEnabled="true"
-				dragMoveEnabled="true"
-				/>
-		</mx:VBox>
-		<mx:VRule height="100%"/>
-		<mx:VBox>
-			<mx:Label text="Measures" fontWeight="bold"/>
-			<mx:List
-				id="sourceList" 
-				width="150" 
-				alternatingItemColors="[0xf0f0f0, 0xf5f5f5]" 
-				allowMultipleSelection="true"
-				dragEnabled="true"
-				dragMoveEnabled="true"
-				dropEnabled="true"/>
-		</mx:VBox>
-	</mx:HBox>
+	<mx:VBox width="100%">
+		<mx:Text width="100%">
+			<mx:text>
+				Here you can create the new complex interesting measure by using the following 
+				checkboxes. If the 'Enabled' checkbox if checked, this simple measure will be 
+				included in the complex measure. If the 'Is Up' checkbox in the simple measure
+				is checked, then we are interested in highest values of the measure.
+			</mx:text>
+		</mx:Text>
+		<mx:List
+			id="list"
+			width="100%" 
+			rowCount="5"
+			alternatingItemColors="[0xf0f0f0, 0xf5f5f5]"  
+			/>
+	</mx:VBox>
 	<mx:HBox>
 		<mx:Label text="Name:"/>
 		<mx:TextInput id="nameInput" width="200" backgroundColor="0xFFFFFF" backgroundAlpha="1"/> 
-		<mx:Button enabled="{targetList.dataProvider.length > 0}" label="Save" click="onSave(event)"/>
-		<mx:Button label="Cancel" click="onCancel(event)"/>
+		<mx:Button id="saveButton" label="Save" click="onSave(event)"/>
+		<mx:Button id="cancelButton" label="Cancel" click="onCancel(event)"/>
 	</mx:HBox>
 	<mx:Script>
 		<![CDATA[
@@ -56,30 +47,48 @@
 			import mx.containers.Canvas;
 			import mx.managers.DragManager;
 			
+			private var dataProvider:ArrayCollection;
+			
+			private function getCurrentMeasures():Array
+			{
+				var usedMeasures:Array = new Array();
+				for (var i:Number = 0; i < dataProvider.length; i++)
+				{
+					var simpleMeasure:SimpleMeasure = SimpleMeasure(dataProvider.getItemAt(i)); 
+					if (simpleMeasure.enabled)
+						usedMeasures.push(simpleMeasure);
+				}
+				
+				return usedMeasures;
+			}
+			
 			private function onCreationComplete(event:Event):void
 			{
-				var targetDP:ArrayCollection = new ArrayCollection([]);
-				targetDP.addEventListener(CollectionEvent.COLLECTION_CHANGE, onTargetDPChange, false, 0, true); 
-				targetList.dataProvider = targetDP;
+				list.itemRenderer = new ClassFactory(MeasureItemRenderer);
 				
-				var dataProvider:ArrayCollection = new ArrayCollection();
+				dataProvider = new ArrayCollection();
+				dataProvider.addItem(new SimpleMeasure(SimpleMeasure.SUPPORT));
 				dataProvider.addItem(new SimpleMeasure(SimpleMeasure.CONFIDENCE));
 				dataProvider.addItem(new SimpleMeasure(SimpleMeasure.COVERAGE));
 				dataProvider.addItem(new SimpleMeasure(SimpleMeasure.LEVERAGE));
 				dataProvider.addItem(new SimpleMeasure(SimpleMeasure.LIFT));
-				dataProvider.addItem(new SimpleMeasure(SimpleMeasure.SUPPORT));
-				sourceList.dataProvider = dataProvider;
+				dataProvider.addEventListener(CollectionEvent.COLLECTION_CHANGE, onDataProviderChange, false, 0, true); 
+				list.dataProvider = dataProvider;
 			}
 			
-			private function onTargetDPChange(event:CollectionEvent):void
+			private function onDataProviderChange(event:CollectionEvent):void
 			{
-				nameInput.text = (event.target as ArrayCollection).source.join("-");
+				var currMeasures:Array = getCurrentMeasures();
+				
+				nameInput.text = currMeasures.join(" ");
+				
+				saveButton.enabled = (currMeasures.length > 0);
 			}
 			
 			private function onSave(event:Event):void
 			{
 				var measure:InterestingMeasure = new InterestingMeasure();
-				measure.simpleMeasures = targetList.dataProvider as ArrayCollection;
+				measure.simpleMeasures = new ArrayCollection(getCurrentMeasures());
 				
 				PopUpManager.removePopUp(this);
 				

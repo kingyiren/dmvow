@@ -17,7 +17,7 @@ package ru.dmvow.model.view.interestingMeasures
 			if (name)
 				return name;
 			else
-				return simpleMeasures.source.join("-");
+				return simpleMeasures.source.join(" ");
 		}
 	}
 }

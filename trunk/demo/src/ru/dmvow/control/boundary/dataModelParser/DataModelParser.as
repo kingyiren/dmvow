@@ -8,6 +8,7 @@ package ru.dmvow.control.boundary.dataModelParser
 	import ru.dmvow.control.boundary.pmmlParser.PMMLParser;
 	import ru.dmvow.control.boundary.sqlParser.SQLParser;
 	import ru.dmvow.model.DataModel;
+	import ru.dmvow.model.common.IRule;
 	import ru.dmvow.model.pmml.PMMLMiningModel;
 	import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationModel;
 	import ru.dmvow.model.sql.SQLMiningModel;
@@ -33,6 +34,29 @@ package ru.dmvow.control.boundary.dataModelParser
 			sqlParser.addEventListener(Event.COMPLETE, onSQLParserComplete);
 			sqlParser.addEventListener(ProgressEvent.PROGRESS, onParserProgress);
 			sqlParser.addEventListener(ErrorEvent.ERROR, onParserError);
+		}
+		
+		/**
+		 * If the passed rule doesn't have all the simple measures counted
+		 * (default uncounted value is -1), we will count and set them. 
+		 */ 
+		public static function countRuleMeasures(rule:IRule):void
+		{
+			// Lift(X → Y) = P(X and Y)/[P(X) * P(Y)]. It's values are in range [0, +inf].
+			// Lift(rule) = Confidence(rule)/Support(consequent);
+			if (rule.ruleLift == -1)
+				rule.ruleLift = rule.ruleConfidence / rule.ruleConsequent.itemsetSupport;
+				
+			// Leverage(X → Y) = P(X and Y) -([P(X) * P(Y)). It's values are in range [0, 1).
+			// Leverage(rule) = Support(rule) -  Support(antecedent) * Support(consequent);
+			if (rule.ruleLeverage == -1)
+				rule.ruleLeverage =	rule.ruleSupport - 
+					rule.ruleAntecedent.itemsetSupport * rule.ruleConsequent.itemsetSupport;
+					
+			// Coverage(X → Y) = P(X and Y)/P(Y). It's values are in range [0, 1].
+			// Coverage(rule) = Support(rule) / Support(consequent);
+			if (rule.ruleCoverage == -1)
+				rule.ruleCoverage = rule.ruleSupport / rule.ruleConsequent.itemsetSupport;
 		}
 		
 		public function parse(data:String):void

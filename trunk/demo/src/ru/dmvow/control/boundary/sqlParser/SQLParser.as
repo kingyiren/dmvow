@@ -1,10 +1,6 @@
 package ru.dmvow.control.boundary.sqlParser
 {
-	import flash.events.ErrorEvent;
-	import flash.events.Event;
-	import flash.events.TimerEvent;
-	import flash.utils.Timer;
-	
+	import ru.dmvow.control.boundary.dataModelParser.DataModelParser;
 	import ru.dmvow.control.common.AsyncObject;
 	import ru.dmvow.model.sql.SQL;
 	import ru.dmvow.model.sql.associationModel.SQLAssociationModel;
@@ -170,6 +166,8 @@ package ru.dmvow.control.boundary.sqlParser
 				rule.support = Number(xml.@support) / result.model.maxSupport;
 				rule.confidence = Number(xml.@confidence);
 				
+				DataModelParser.countRuleMeasures(rule);
+			
 				result.model.associationRules.addItem(rule);
 			}
 			catch (error: *)

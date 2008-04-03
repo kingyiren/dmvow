@@ -25,5 +25,10 @@ package ru.dmvow.model.sql.associationModel
 		{
 			return items;
 		}
+		
+		public function get itemsetSupport():Number
+		{
+			return support;
+		}
 	}
 }

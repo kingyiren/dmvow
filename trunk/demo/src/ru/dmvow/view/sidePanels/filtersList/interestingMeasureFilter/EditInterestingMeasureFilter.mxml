@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel
+	title="Edit interesting measure filter" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	paddingTop="5"
+	paddingRight="5"
+	paddingBottom="5"
+	paddingLeft="5"
+	layout="vertical"
+	creationComplete="onCreationComplete(event)"
+	>
+	<mx:Metadata>
+		[Event(name="save", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent")]
+		[Event(name="cancel", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.model.view.interestingMeasures.InterestingMeasure;
+			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent;
+			import ru.dmvow.model.view.processingList.items.interestingMeasureFilter.InterestingMeasureFilterItem;
+			import mx.events.DragEvent;
+			import mx.managers.PopUpManager;
+			import mx.collections.SortField;
+			import mx.collections.Sort;
+			import mx.collections.ArrayCollection;
+			
+			private var _interestingMeasureFilterItem:InterestingMeasureFilterItem;
+			private var _newFilter:Boolean;
+			private var _interestingMeasures:ArrayCollection;
+			
+			public function set newFilter(value:Boolean):void
+			{
+				_newFilter = value;
+				
+				if (_newFilter)
+					interestingMeasureFilterItem = new InterestingMeasureFilterItem();
+			}
+			
+			public function get newFilter():Boolean
+			{
+				return _newFilter;
+			}
+			
+			[Bindable]
+			public function set interestingMeasures(value:ArrayCollection):void
+			{
+				_interestingMeasures = value;
+			}
+			
+			public function get interestingMeasures():ArrayCollection
+			{
+				return _interestingMeasures;
+			}
+			
+			[Bindable]
+			public function set interestingMeasureFilterItem(value:InterestingMeasureFilterItem):void
+			{
+				_interestingMeasureFilterItem = value;
+			}
+			
+			public function get interestingMeasureFilterItem():InterestingMeasureFilterItem
+			{
+				return _interestingMeasureFilterItem;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				onComboBoxChange(null);
+			}
+			
+			private function onComboBoxChange(event:Event):void
+			{
+				interestingMeasureFilterItem.interestingMeasure = comboBox.selectedItem as InterestingMeasure;
+			}
+			
+			private function onHSliderChange(event:Event):void
+			{
+				interestingMeasureFilterItem.percentage = hSlider.value; 
+			}
+			
+			private function onSave(event:Event):void
+			{
+				var newEvent:EditFilterEvent = new EditFilterEvent(EditFilterEvent.SAVE);
+				dispatchEvent(newEvent);
+			}
+			
+			private function onCancel(event:Event):void
+			{
+				var newEvent:EditFilterEvent = new EditFilterEvent(EditFilterEvent.CANCEL);
+				dispatchEvent(newEvent);
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%">
+		<mx:Label text="Select complex interesting measure to use:"/>
+		<mx:ComboBox id="comboBox" width="300" dataProvider="{interestingMeasures}" change="onComboBoxChange(event)"/>
+		<mx:Spacer height="10"/>
+		<mx:Label text="Select the percent of most interesting objects to show:"/>
+		<mx:HSlider 
+			width="100%" 
+			id="hSlider"
+			minimum="1" maximum="99" 
+            dataTipPlacement="top" 
+            tickColor="black" 
+            snapInterval="1" tickInterval="{98/4}" 
+            labels="['1%', '25%', '50%', '75%','99%']" 
+            allowTrackClick="true" 
+            liveDragging="true"
+            change="onHSliderChange(event)"
+			value="{interestingMeasureFilterItem.percentage}"/>
+	</mx:VBox>
+	<mx:HBox paddingTop="10">
+		<mx:Button label="Save" enabled="{interestingMeasureFilterItem.interestingMeasure != null}" click="onSave(event)"/>
+		<mx:Button label="Cancel" click="onCancel(event)"/>
+	</mx:HBox>
+</mx:Panel>

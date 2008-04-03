@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas
+	creationComplete="onCreationComplete(event)"
+	xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import ru.dmvow.model.view.interestingMeasures.SimpleMeasure;
+			
+			private var _simpleMeasure:SimpleMeasure;
+			
+			[Bindable]
+			public function set simpleMeasure(value:SimpleMeasure):void
+			{
+				_simpleMeasure = value;
+			}
+			
+			public function get simpleMeasure():SimpleMeasure
+			{
+				return _simpleMeasure;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				BindingUtils.bindProperty(this, "simpleMeasure", this, "data");
+			}
+			
+			private function onEnabledClick(event:Event):void
+			{
+				simpleMeasure.enabled = enabledCheckBox.selected; 
+			}
+			
+			private function onIsUpClick(event:Event):void
+			{
+				simpleMeasure.isUp = isUpCheckBox.selected; 
+			}
+		]]>
+	</mx:Script>
+	<mx:HBox width="100%" verticalAlign="middle">
+		<!-- For some reason, the data binding doesn't work with this checkboxes.
+		That's why we used listeners. Binding is used only for initialization -->
+		<mx:CheckBox id="enabledCheckBox" label="Enabled" fontSize="9" labelPlacement="right" textAlign="center" click="onEnabledClick(event)" selected="{simpleMeasure.enabled}"/>
+		<mx:CheckBox id="isUpCheckBox" label="Is Up" fontSize="9" labelPlacement="right"  textAlign="center" click="onIsUpClick(event)" selected="{simpleMeasure.isUp}"/>
+		<mx:Text htmlText="{'' + simpleMeasure.type + '. ' + simpleMeasure.description}"/>
+	</mx:HBox>
+</mx:Canvas>
