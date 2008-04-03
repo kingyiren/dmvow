@@ -10,7 +10,8 @@
 	paddingLeft="5"
 	xmlns:itemsFilter="ru.dmvow.view.sidePanels.filtersList.itemsFilter.*">
 	<mx:Metadata>
-		[Event(name="cancel", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilterEvent")]
+		[Event(name="save", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent")]
+		[Event(name="cancel", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent")]
 	</mx:Metadata>
 	<mx:VBox>
 		<mx:Text width="100%" text="Drag items from the list of items available in model into the left and right rule constraints. Click 'Plus' or 'Minus' to toggle their existence in the matched rules."/>
@@ -138,13 +139,13 @@
 			
 			private function onSave(event:Event):void
 			{
-				var newEvent:EditItemsFilterEvent = new EditItemsFilterEvent(EditItemsFilterEvent.SAVE);
+				var newEvent:EditFilterEvent = new EditFilterEvent(EditFilterEvent.SAVE);
 				dispatchEvent(newEvent);
 			}
 			
 			private function onCancel(event:Event):void
 			{
-				var newEvent:EditItemsFilterEvent = new EditItemsFilterEvent(EditItemsFilterEvent.CANCEL);
+				var newEvent:EditFilterEvent = new EditFilterEvent(EditFilterEvent.CANCEL);
 				dispatchEvent(newEvent);
 			}
 		]]>

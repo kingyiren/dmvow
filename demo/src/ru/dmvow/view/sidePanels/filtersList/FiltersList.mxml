@@ -17,16 +17,22 @@
 	</mx:Metadata>
 	<mx:Script>
 		<![CDATA[
+			import ru.dmvow.model.view.processingList.items.clusterFilter.ClusterFilterItem;
+			import ru.dmvow.model.view.DMVoWModel;
+			import ru.dmvow.view.sidePanels.filtersList.interestingMeasureFilter.EditInterestingMeasureFilter;
+			import ru.dmvow.model.view.processingList.items.interestingMeasureFilter.InterestingMeasureFilterItem;
 			import mx.events.DragEvent;
 			import mx.collections.ArrayCollection;
-			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilterEvent;
+			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent;
 			import mx.managers.PopUpManager;
 			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
 			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditItemsFilter;
 			import ru.dmvow.model.DataModel;
 			
 			private var _model:DataModel;
+			private var _dmvowModel:DMVoWModel;
 			private var editItemsFilter:EditItemsFilter = new EditItemsFilter();
+			private var editInterestingMeasureFilter:EditInterestingMeasureFilter = new EditInterestingMeasureFilter();
 			private var editFilterIndex:Number; 
 			
 			[Bindable]
@@ -40,25 +46,50 @@
 				return _model;
 			}
 			
+			[Bindable]
+			public function set dmvowModel(value:DMVoWModel):void
+			{
+				_dmvowModel = value;
+			}
+			
+			public function get dmvowModel():DMVoWModel
+			{
+				return _dmvowModel;
+			}
+			
 			private function showEditItemsFilter(item:ItemsFilterItem = null):void
 			{
 				editItemsFilter.newFilter = (item == null);
 				if (item)
 					editItemsFilter.itemsFilterItem = item;
 				
-				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
 				editItemsFilter.items = model.data.dataModel.modelItems;
 				
 				PopUpManager.addPopUp(editItemsFilter, DMVoW.instance, true);
 				PopUpManager.centerPopUp(editItemsFilter);
 			}
 			
+			private function showInterestingMeasureFilter(item:InterestingMeasureFilterItem = null):void
+			{
+				editInterestingMeasureFilter.newFilter = (item == null);
+				if (item)
+					editInterestingMeasureFilter.interestingMeasureFilterItem = item;
+				
+				editInterestingMeasureFilter.interestingMeasures = dmvowModel.interestingMeasures;
+				
+				PopUpManager.addPopUp(editInterestingMeasureFilter, DMVoW.instance, true);
+				PopUpManager.centerPopUp(editInterestingMeasureFilter);
+			}
+			
 			private function onCreationComplete(event:Event):void
 			{
 				list.itemRenderer = new ClassFactory(FiltersListRenderer);
 				
-				editItemsFilter.addEventListener(EditItemsFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
-				editItemsFilter.addEventListener(EditItemsFilterEvent.CANCEL, onEditItemsFilterCancel, false, 0, true);
+				editItemsFilter.addEventListener(EditFilterEvent.SAVE, onEditItemsFilterSave, false, 0, true);
+				editItemsFilter.addEventListener(EditFilterEvent.CANCEL, onEditItemsFilterCancel, false, 0, true);
+				
+				editInterestingMeasureFilter.addEventListener(EditFilterEvent.SAVE, onEditInterestingMeasureFilterSave, false, 0, true);
+				editInterestingMeasureFilter.addEventListener(EditFilterEvent.CANCEL, onEditInterestingMeasureFilterCancel, false, 0, true);
 				
 				// Events, that are bubbled from the list items
 				addEventListener(FiltersListItemEvent.REMOVE, onItemRemove, false, 0, true);
@@ -71,9 +102,17 @@
 				showEditItemsFilter();
 			}
 			
-			// model.processingList.addItem(editItemsFilter.itemsFilterItem);
+			private function onAddInterestingMeasure(event:Event):void
+			{
+				showInterestingMeasureFilter();
+			}
 			
-			private function onEditItemsFilterSave(event:EditItemsFilterEvent):void
+			private function onAddClustering(event:Event):void
+			{
+				model.processingList.addItem(new ClusterFilterItem());
+			}
+			
+			private function onEditItemsFilterSave(event:EditFilterEvent):void
 			{
 				PopUpManager.removePopUp(editItemsFilter);
 				
@@ -81,11 +120,27 @@
 					model.processingList.addItem(editItemsFilter.itemsFilterItem);
 			}
 			
-			private function onEditItemsFilterCancel(event:EditItemsFilterEvent):void
+			private function onEditItemsFilterCancel(event:EditFilterEvent):void
 			{
 				PopUpManager.removePopUp(editItemsFilter);
 				
-				if (editItemsFilter.newFilter)
+				if (!editItemsFilter.newFilter)
+					model.processingList.removeItemAt(model.processingList.length - 1);
+			}
+
+			private function onEditInterestingMeasureFilterSave(event:EditFilterEvent):void
+			{
+				PopUpManager.removePopUp(editInterestingMeasureFilter);
+				
+				if (editInterestingMeasureFilter.newFilter)
+					model.processingList.addItem(editInterestingMeasureFilter.interestingMeasureFilterItem);
+			}
+			
+			private function onEditInterestingMeasureFilterCancel(event:EditFilterEvent):void
+			{
+				PopUpManager.removePopUp(editInterestingMeasureFilter);
+				
+				if (!editInterestingMeasureFilter.newFilter)
 					model.processingList.removeItemAt(model.processingList.length - 1);
 			}
 			
@@ -101,9 +156,11 @@
 			private function onItemEdit(event:FiltersListItemEvent):void
 			{
 				if (event.item is ItemsFilterItem)
-				{
 					showEditItemsFilter(event.item as ItemsFilterItem);
-				}
+				if (event.item is InterestingMeasureFilterItem)
+					showInterestingMeasureFilter(event.item as InterestingMeasureFilterItem);
+				else
+					throw new Error("Unknown list item to edit.");
 				
 				event.stopImmediatePropagation();
 			}
@@ -129,13 +186,24 @@
 	<filtersList:FiltersListProgress
 		id="listProgress" 
 		width="100%" 
-		height="250"
+		height="200"
 		visible="{model.processingList.working}" 
 		progress="{model.processingList.progress}" 
 		/>
-	<mx:Button 
-		label="Add rule content filter" 
-		click="onAddItemsFilter(event)" 
-		enabled="{!model.processingList.working}"/>
+	<mx:HBox>
+		<mx:Button 
+			label="Content filter" 
+			click="onAddItemsFilter(event)" 
+			enabled="{!model.processingList.working}"/>
+		<mx:Button 
+			label="Interesting measure filter" 
+			click="onAddInterestingMeasure(event)" 
+			enabled="{!model.processingList.working}"/>
+		<mx:Button 
+			label="Clustering filter" 
+			click="onAddClustering(event)" 
+			enabled="{!model.processingList.working}"/>
+	</mx:HBox>
+	
 	<filters:FiltersListController model="{model}" filtersList="{this}"/>
 </mx:Panel>

@@ -1,5 +1,6 @@
 package ru.dmvow.control.boundary.pmmlParser
 {
+	import ru.dmvow.control.boundary.dataModelParser.DataModelParser;
 	import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationModel;
 	import ru.dmvow.model.pmml.models.associationModel.PMMLAssociationRule;
 	import ru.dmvow.model.pmml.models.associationModel.PMMLItem;
@@ -84,6 +85,8 @@ package ru.dmvow.control.boundary.pmmlParser
 				result.lift = Number(xml.@lift);
 			if (xml.attribute("id").length() > 0)
 				result.id = xml.@id;
+			
+			DataModelParser.countRuleMeasures(result);
 			
 			return result;
 		}

@@ -7,6 +7,7 @@ import flash.events.ProgressEvent;
 import mx.events.CollectionEvent;
 
 import ru.dmvow.control.filters.workers.AbstractWorker;
+import ru.dmvow.control.filters.workers.InterestingMeasureFilterWorker;
 import ru.dmvow.control.filters.workers.ItemsFilterWorker;
 import ru.dmvow.model.DataModel;
 import ru.dmvow.model.common.IData;
@@ -15,6 +16,7 @@ import ru.dmvow.model.view.processingList.history.ProcessingData;
 import ru.dmvow.model.view.processingList.history.ProcessingItemDescription;
 import ru.dmvow.model.view.processingList.items.ProcessingListItem;
 import ru.dmvow.model.view.processingList.items.SourceItem;
+import ru.dmvow.model.view.processingList.items.interestingMeasureFilter.InterestingMeasureFilterItem;
 import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
 import ru.dmvow.view.sidePanels.filtersList.FiltersList;
 import ru.dmvow.view.sidePanels.filtersList.FiltersListItemEvent;
@@ -75,6 +77,8 @@ public class FiltersListController extends EventDispatcher
 		var result:AbstractWorker;
 		if (item is ItemsFilterItem)
 			result = new ItemsFilterWorker;
+		else if (item is InterestingMeasureFilterItem)
+			result = new InterestingMeasureFilterWorker;
 		else
 			throw new Error("Can't find appropriate worker.");
 			
@@ -221,6 +225,7 @@ public class FiltersListController extends EventDispatcher
 			workersListIndex = -1;
 			_model.processingList.working = true;
 			startingData = null;
+			workersList = new Array();
 			setProgress(0);
 			
 			// Fill the workers list

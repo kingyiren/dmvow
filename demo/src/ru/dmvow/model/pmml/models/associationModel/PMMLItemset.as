@@ -51,5 +51,10 @@ package ru.dmvow.model.pmml.models.associationModel
 		{
 			return items;
 		}
+		
+		public function get itemsetSupport():Number
+		{
+			return support;
+		}
 	}
 }

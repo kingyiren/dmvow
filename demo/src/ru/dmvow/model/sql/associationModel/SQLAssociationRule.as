@@ -10,8 +10,11 @@ public class SQLAssociationRule implements IRule
 	public var antecedent:SQLItemset;
 	/** Required. Some SQLItemset object. */
 	public var consequent:SQLItemset;
-	public var support:Number;
-	public var confidence:Number;
+	public var support:Number = -1;
+	public var confidence:Number = -1;
+	public var leverage:Number = -1;
+	public var coverage:Number = -1;
+	public var lift:Number = -1;
 	
 	public function toString():String
 	{
@@ -36,6 +39,36 @@ public class SQLAssociationRule implements IRule
 	public function get ruleSupport():Number
 	{
 		return support;
+	}
+	
+	public function get ruleCoverage():Number
+	{
+		return coverage;
+	}
+	
+	public function set ruleCoverage(value:Number):void
+	{
+		coverage = value;
+	}
+	
+	public function get ruleLeverage():Number
+	{
+		return leverage;
+	}
+	
+	public function set ruleLeverage(value:Number):void
+	{
+		leverage = value;
+	}
+	
+	public function get ruleLift():Number
+	{
+		return lift;
+	}
+	
+	public function set ruleLift(value:Number):void
+	{
+		lift = value;
 	}
 }
 }
