@@ -4,5 +4,7 @@ package ru.dmvow.model.common
 	{
 		function get itemName():String;
 		function get itemValue():String;
+		function get index():Number;
+		function set index(value:Number):void;
 	}
 }

@@ -18,7 +18,8 @@ public class SQLAssociationRule implements IRule
 	
 	public function toString():String
 	{
-		return antecedent.toString() + "\n->\n" + consequent.toString();
+		return antecedent.toString() + "\n->\n" + consequent.toString() + 
+			"\n(supp: " + support.toFixed(3) + ", conf: " + confidence.toFixed(3) + ")";
 	}
 	
 	public function get ruleAntecedent():IItemset

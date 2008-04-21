@@ -1,11 +1,10 @@
 package ru.dmvow.control.filters.workers
 {
-import flash.utils.clearInterval;
-
 import ru.dmvow.model.common.IData;
 import ru.dmvow.model.common.IItem;
 import ru.dmvow.model.common.IItemset;
 import ru.dmvow.model.common.IRule;
+import ru.dmvow.model.view.DMVoWModel;
 import ru.dmvow.model.view.processingList.items.ProcessingListItem;
 import ru.dmvow.model.view.processingList.items.itemsFilter.ItemPattern;
 import ru.dmvow.model.view.processingList.items.itemsFilter.ItemsFilterItem;
@@ -37,7 +36,7 @@ public class ItemsFilterWorker extends AbstractWorker
 		super();
 	}
 	
-	override public function start(previousStepData:IData, processingListItem:ProcessingListItem):void
+	override public function start(previousStepData:IData, processingListItem:ProcessingListItem, dmvowModel:DMVoWModel = null):void
 	{
 		this.previousStepData = previousStepData;
 		this.filterItem = processingListItem as ItemsFilterItem;

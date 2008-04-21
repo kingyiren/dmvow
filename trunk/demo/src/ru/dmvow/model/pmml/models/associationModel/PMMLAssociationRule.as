@@ -42,7 +42,8 @@ public class PMMLAssociationRule extends Extendable implements IRule
 	
 	public function toString():String
 	{
-		return antecedent.toString() + "\n->\n" + consequent.toString();
+		return antecedent.toString() + "\n->\n" + consequent.toString() + 
+			"(supp: " + support.toFixed(3) + ", conf: " + confidence.toFixed(3) + ")";
 	}
 
 	public function get ruleAntecedent():IItemset

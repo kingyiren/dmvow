@@ -43,6 +43,16 @@ package ru.dmvow.model.pmml.models.associationModel
 		[Bindable]
 		public var weight:Number;
 		
+		private var _index:Number;
+		
+		public function toString():String
+		{
+			if (mappedValue)
+				return value + " = " + mappedValue;
+			else
+				return value;
+		}
+		
 		public function get itemName():String
 		{
 			return value;
@@ -53,12 +63,14 @@ package ru.dmvow.model.pmml.models.associationModel
 			return mappedValue;
 		}
 		
-		public function toString():String
+		public function get index():Number
 		{
-			if (mappedValue)
-				return value + " = " + mappedValue;
-			else
-				return value;
+			return _index;
+		}
+		
+		public function set index(value:Number):void
+		{
+			_index = value;
 		}
 	}
 }

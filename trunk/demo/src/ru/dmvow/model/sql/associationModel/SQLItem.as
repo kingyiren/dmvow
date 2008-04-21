@@ -10,6 +10,13 @@ package ru.dmvow.model.sql.associationModel
 		/** Source string */
 		public var string:String;
 		
+		private var _index:Number;
+		
+		public function toString():String
+		{
+			return string; 
+		}
+		
 		public function get itemName():String
 		{
 			return name;
@@ -20,9 +27,14 @@ package ru.dmvow.model.sql.associationModel
 			return value;
 		}
 		
-		public function toString():String
+		public function get index():Number
 		{
-			return string; 
+			return _index;
+		}
+		
+		public function set index(value:Number):void
+		{
+			_index = value;
 		}
 	}
 }
