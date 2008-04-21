@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	cornerRadius="8"
+	backgroundColor="0xE0E0E0"
+	borderStyle="outset"
+	borderColor="0x222222"
+	borderThickness="2"
+	creationComplete="onCreationComplete(event)">
+	<mx:Text 
+		id="textView" 
+		maxWidth="300" 
+		paddingBottom="5"
+		paddingTop="5"
+		paddingLeft="5"
+		paddingRight="5"
+		selectable="false"
+		mouseEnabled="false"/>
+	<mx:Script>
+		<![CDATA[
+			protected var _causedBy:Array; 
+		
+			public function set causedBy(value:Array):void
+			{
+				_causedBy = value;
+				
+				if (_causedBy && textView)
+					textView.text = value.join("\n\n");
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				if (_causedBy)
+					causedBy = _causedBy;
+			}
+		]]>
+	</mx:Script>	
+</mx:Canvas>

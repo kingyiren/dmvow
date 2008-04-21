@@ -4,6 +4,7 @@ import ru.dmvow.control.common.AsyncObject;
 import ru.dmvow.model.common.IData;
 import ru.dmvow.model.common.IItemset;
 import ru.dmvow.model.common.IRule;
+import ru.dmvow.model.view.DMVoWModel;
 import ru.dmvow.model.view.processingList.items.ProcessingListItem;
 
 public class AbstractWorker extends AsyncObject
@@ -15,7 +16,7 @@ public class AbstractWorker extends AsyncObject
 	{
 	}
 	
-	public function start(previousStepData:IData, processingListItem:ProcessingListItem):void
+	public function start(previousStepData:IData, processingListItem:ProcessingListItem, dmvowModel:DMVoWModel = null):void
 	{
 	}
 	

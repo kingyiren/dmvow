@@ -10,7 +10,8 @@
 	xmlns:control="ru.dmvow.control.*" 
 	xmlns:view1="ru.dmvow.model.view.*" 
 	xmlns:field="ru.dmvow.view.field.*" 
-	xmlns:filtersList="ru.dmvow.view.sidePanels.filtersList.*" xmlns:interestingMeasures="ru.dmvow.view.sidePanels.interestingMeasures.*">
+	xmlns:filtersList="ru.dmvow.view.sidePanels.filtersList.*" xmlns:interestingMeasures="ru.dmvow.view.sidePanels.interestingMeasures.*" xmlns:cluster="ru.dmvow.view.cluster.*"
+	currentState="{model.currentState}">
 	<mx:Style>
 		@font-face {
 			src: local("Arial");
@@ -37,15 +38,26 @@
 			}
 		]]>
 	</mx:Script>
-	<mx:HDividedBox paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" width="100%" height="100%">
-		<mx:VBox width="40%" paddingLeft="5" paddingRight="5" height="100%">
-			<!-- Содержимое левой колонки -->
-			<loadedModels:LoadedModels id="loadedModels" width="100%" models="{model.models}"/>
-			<interestingMeasures:InterestingMeasures id="interestingMeasures" width="100%" interestingMeasures="{model.interestingMeasures}"/>
-			<filtersList:FiltersList id="filtersList" width="100%" model="{model.selectedModel}" dmvowModel="{model}" visible="{model.selectedModel != null}" />
-		</mx:VBox>
-		<field:DataModelView id="dataModelView" model="{model.selectedModel.processingList.selectedItem.data}"/>
-	</mx:HDividedBox>
+	<mx:states>
+		<mx:State name="{DMVoWModel.COMMON_STATE}">
+			<mx:AddChild>
+				<mx:HDividedBox paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" width="100%" height="100%">
+					<mx:VBox width="40%" paddingLeft="5" paddingRight="5" height="100%">
+						<!-- Содержимое левой колонки -->
+						<loadedModels:LoadedModels id="loadedModels" width="100%" models="{model.models}"/>
+						<interestingMeasures:InterestingMeasures id="interestingMeasures" width="100%" interestingMeasures="{model.interestingMeasures}"/>
+						<filtersList:FiltersList id="filtersList" width="100%" model="{model.selectedModel}" dmvowModel="{model}" visible="{model.selectedModel != null}" />
+					</mx:VBox>
+					<field:DataModelView id="dataModelView" model="{model.selectedModel.processingList.selectedItem.data}"/>
+				</mx:HDividedBox>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{DMVoWModel.CLUSTER_STATE}">
+			<mx:AddChild>
+				<cluster:ClusterView cluster="{model.cluster}"/>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
 	
 	<!-- Контроллер -->
 	<view1:DMVoWModel id="model" selectedModel="{loadedModels.selectedModel}"/>

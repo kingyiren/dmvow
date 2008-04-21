@@ -54,16 +54,17 @@ package ru.dmvow.control.dataNet.builders
 			for (var i:Number = 0; i < currNode.links.length; i++)
 			{
 				currLink = currNode.links[i];
-				currLinkWeight = 1;
+				currLinkWeight = 2;
 				for (var j:Number = 0; j < currLink.causedBy.length; j++)
 				{
 					rule = currLink.causedBy[j];
-					currLinkWeight += rule.ruleConfidence * 20;
+					currLinkWeight += rule.ruleSupport * 40;
 				}
 				currLinkWeight = Math.round(currLinkWeight);
 				linkRenderer = new CommonLinkRenderer(
 					group.particles[counter], 
 					group.particles[getIndex(currLink.dest)],
+					currLink.causedBy,
 					currLinkWeight);
 				group.addConstraint(linkRenderer); 
 			}

@@ -2,6 +2,7 @@ package ru.dmvow.control.filters.workers
 {
 import ru.dmvow.model.common.IData;
 import ru.dmvow.model.common.IRule;
+import ru.dmvow.model.view.DMVoWModel;
 import ru.dmvow.model.view.interestingMeasures.SimpleMeasure;
 import ru.dmvow.model.view.processingList.items.ProcessingListItem;
 import ru.dmvow.model.view.processingList.items.interestingMeasureFilter.InterestingMeasureFilterItem;
@@ -20,7 +21,7 @@ public class InterestingMeasureFilterWorker extends AbstractWorker
 		super();
 	}
 	
-	override public function start(previousStepData:IData, processingListItem:ProcessingListItem):void
+	override public function start(previousStepData:IData, processingListItem:ProcessingListItem, dmvowModel:DMVoWModel = null):void
 	{
 		this.previousStepData = previousStepData;
 		this.filterItem = processingListItem as InterestingMeasureFilterItem;

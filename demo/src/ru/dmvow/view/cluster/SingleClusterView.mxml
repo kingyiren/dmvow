@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="{WIDTH}" 
+	height="{HEIGHT}"
+	backgroundColor="0xFFFFFF"
+	backgroundAlpha="1"
+	borderColor="0x828282"
+	borderStyle="solid"
+	borderThickness="3"
+	cornerRadius="2" 
+	xmlns:cluster="ru.dmvow.view.cluster.*"
+	horizontalScrollPolicy="off"
+	verticalScrollPolicy="off"
+	creationComplete="onCreationComplete(event)"
+	>
+	<mx:Metadata>
+		[Event(name="minimize", type="ru.dmvow.view.cluster.ClusterEvent")]
+		[Event(name="maximize", type="ru.dmvow.view.cluster.ClusterEvent")]
+		[Event(name="discard", type="ru.dmvow.view.cluster.ClusterEvent")]
+		[Event(name="enter", type="ru.dmvow.view.cluster.ClusterEvent")]
+	</mx:Metadata>
+	<mx:Style>
+		.myLabel
+		{
+			fontSize: 12px;
+			fontFamily: "Arial";
+		}
+	</mx:Style>
+	<mx:states>
+		<mx:State name="{MIN_STATE}">
+			<mx:AddChild>
+				<mx:Button 
+					label="Maximize"
+					horizontalCenter="0"
+					verticalCenter="0" 
+					styleName="myButton" 
+					click="onMaximizeClick(event)"/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{COMMON_STATE}">
+			<mx:AddChild>
+				<mx:Canvas>
+					<mx:Label 
+						id="mainLabel" 
+						x="3" 
+						y="0" 
+						styleName="myLabel"
+						text="{'Level ' + cluster.level.toString()}" fontWeight="bold"/>
+					<mx:Label 
+						id="subLabel" 
+						x="{mainLabel.x}" 
+						y="{mainLabel.y + mainLabel.height - 8}" 
+						styleName="myLabel"
+						htmlText="{'Total rules: ' + cluster.size}" fontStyle="italic"/>
+					<cluster:MiniHBar id="supportBar" value="{cluster.avgSupport}" color="0x437d18" x="122" y="5" width="34" height="10"/>
+					<mx:Label
+						x="{supportBar.x + supportBar.width}"
+						y="{supportBar.y - 4}"
+						styleName="myLabel"
+						text="{'S: ' + cluster.avgSupport.toFixed(2)}"
+						color="{supportBar.color}"/>
+					<cluster:MiniHBar id="confidenceBar" value="{cluster.avgConfidence}" color="0xc15e16" x="122" y="18" width="34" height="10"/>
+					<mx:Label
+						x="{confidenceBar.x + confidenceBar.width}"
+						y="{confidenceBar.y - 4}"
+						styleName="myLabel"
+						text="{'C: ' + cluster.avgConfidence.toFixed(2)}"
+						color="{confidenceBar.color}"/>
+					<cluster:MiniHBar id="liftBar" value="{cluster.avgLift}" color="0x1b2a6c" x="122" y="31" width="34" height="10"/>
+					<mx:Label
+						x="{liftBar.x + liftBar.width}"
+						y="{liftBar.y - 4}"
+						styleName="myLabel"
+						text="{'L: ' + cluster.avgLift.toFixed(2)}"
+						color="{liftBar.color}"/>
+						
+					<mx:Text
+						x="3"
+						y="45"
+						fontStyle="italic"
+						text="{'Most fequent antecedent items:\n' + cluster.mostFrequentAntecedentItems.join(', ')}"/>
+						
+					<mx:Text
+						x="3"
+						y="85"
+						fontStyle="italic"
+						text="{'Most fequent consequent items:\n' + cluster.mostFrequentConsequentItems.join(', ')}"/>
+						
+					<mx:Button
+						x="52"
+						y="127"
+						height="16"
+						id="discardButton"
+						label="Discard"
+						fontWeight="normal"
+						paddingBottom="0"
+						paddingLeft="0"
+						paddingRight="0"
+						paddingTop="0"
+						/>
+					<mx:Button
+						x="{discardButton.x + discardButton.width + 3}"
+						y="{discardButton.y}"
+						height="16"
+						id="minimizeButton"
+						label="Minimize"
+						click="onMinimizeClick(event)"
+						fontWeight="normal"
+						paddingBottom="0"
+						paddingLeft="0"
+						paddingRight="0"
+						paddingTop="0"
+						/>
+					<mx:Button
+						x="{minimizeButton.x + minimizeButton.width + 3}"
+						y="{minimizeButton.y}"
+						height="16"
+						id="enterButton"
+						label="Enter"
+						paddingBottom="0"
+						paddingLeft="0"
+						paddingRight="0"
+						paddingTop="0"
+						/>
+				</mx:Canvas>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.model.view.clustering.Cluster;
+			
+			public static const WIDTH:Number = 208;
+			public static const HEIGHT:Number = 152;
+			public static const COMMON_STATE:String = "commonState";
+			public static const MIN_STATE:String = "minState";
+			public var childLink:ClusterLink;
+			public var parentLink:ClusterLink;
+			public var inPlace:Boolean = false;
+			
+			private var _cluster:Cluster;
+			
+			public function draw(index:Number = -1):void
+			{
+				if (!inPlace)
+				{
+					if (childLink)
+					{
+						var hasBadChildren:Boolean = false;
+						for each (var child:SingleClusterView in childLink.childClusters)
+						{
+							if (!child.inPlace)
+							{
+								hasBadChildren = true;
+								break;
+							}
+						}
+						
+						if (hasBadChildren)
+							childLink.draw();
+						
+						y = - HEIGHT * _cluster.level - _cluster.height * ClusterView.totalHeight;
+						x = ((childLink.childClusters[0] as SingleClusterView).x +
+							(childLink.childClusters[childLink.childClusters.length - 1] as SingleClusterView).x)/2;   
+						inPlace = true;
+						
+						if (!childLink.inPlace)
+							childLink.draw();
+						
+						if (parentLink && !parentLink.inPlace)
+							parentLink.draw();
+					}
+					else
+					{
+						if (index < 0)
+							throw new Error("Error.");
+						
+						trace("index: " + index);
+						x = index * (WIDTH + 30);
+						y = - _cluster.height * ClusterView.totalHeight;
+						inPlace = true;
+					}
+				}
+			}
+			
+			public function show():void
+			{
+				if (visible == true)
+					return;
+				
+				visible = true;
+				
+				childLink.show();
+			}
+			
+			public function hide():void
+			{
+				if (visible == false)
+					return;
+					
+				visible = false;
+				
+				childLink.hide();
+			}
+			
+			[Bindable]
+			public function get cluster():Cluster
+			{
+				return _cluster;
+			}
+			
+			public function set cluster(value:Cluster):void
+			{
+				_cluster = value;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				currentState = COMMON_STATE;
+			}
+			
+			private function onMinimizeClick(event:Event):void
+			{
+				currentState = MIN_STATE;
+			}
+			
+			private function onMaximizeClick(event:Event):void
+			{
+				currentState = COMMON_STATE;
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>

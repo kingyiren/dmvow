@@ -63,7 +63,7 @@ package ru.dmvow.view.field.dataNet.renderers
 			width = textField.width + 10;
 			height = textField.height + 10;
 			
-			setFill(0xFFFFFF, 0.9);
+			setFill(0xFFFFFF, 1);
 			setLine(0, 0xAAAAAA, 1);
 			
 			sprite.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	paddingBottom="5"
+	paddingLeft="5"
+	paddingRight="5"
+	width="100%"
+	height="100%"
+	paddingTop="5" 
+	xmlns:cluster="ru.dmvow.view.cluster.*"
+	creationComplete="onCreationComplete(event)"
+	>
+	<mx:Panel
+		id="panelCont"
+		width="100%" 
+		height="100%" 
+		title="Cluster tree"
+		paddingBottom="5"
+		paddingLeft="5"
+		paddingRight="5"
+		paddingTop="5">
+		<!--<cluster:CContainer id="cont"/>-->
+		<mx:Canvas id="cont"/>
+	</mx:Panel>
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.Canvas;
+			import mx.core.UIComponent;
+			import ru.dmvow.model.view.clustering.Cluster;
+			
+			private static var _cluster:Cluster;
+			private var singleClusterView:SingleClusterView;
+			private var inited:Boolean = false;
+			private var zeroLevelIndex:Number = 0;
+			
+			public static function get totalHeight():Number
+			{
+				return _cluster.level * SingleClusterView.HEIGHT;
+			}
+			
+			[Bindable]
+			public function get cluster():Cluster
+			{
+				return _cluster;
+			}
+			
+			public function set cluster(value:Cluster):void
+			{
+				if (_cluster == value)
+					return;
+				
+				if (_cluster)
+				{
+					while (cont.numChildren > 0)
+						cont.removeChildAt(0);
+					singleClusterView = null;
+				}
+				
+				_cluster = value;
+				
+				if (_cluster)
+				{
+					if (cont)
+					{
+						zeroLevelIndex = 0;
+						singleClusterView = addClusterTree(_cluster);
+						singleClusterView.draw();
+					}
+				}
+			}
+			
+			private function addClusterTree(value:Cluster, parentLink:ClusterLink = null):SingleClusterView
+			{
+				var singleCluster:SingleClusterView = new SingleClusterView();
+				singleCluster.cluster = value;
+				if (parentLink)
+				{
+					singleCluster.parentLink = parentLink;
+					parentLink.childClusters.push(singleCluster);
+				}
+				cont.addChild(singleCluster);
+				
+				if (value.clusterChildren.length > 1)
+				{
+					var link:ClusterLink = new ClusterLink();
+					singleCluster.childLink = link;
+					link.parentCluster = singleCluster;
+					cont.addChild(link);
+					
+					for (var i:Number = 0; i < value.clusterChildren.length; i++)
+					{
+						addClusterTree(value.clusterChildren[i] as Cluster, link);
+					} 
+				}
+				else
+				{
+					singleCluster.draw(zeroLevelIndex++);
+				}
+				
+				return singleCluster;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				inited = true;
+				
+				if (_cluster)
+				{
+					var t:Cluster = _cluster;
+					_cluster = null;
+					cluster = t;
+				}
+				
+				addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, false, 0, true);
+				addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
+			}
+			
+			private function onMouseWheel(event:MouseEvent):void
+			{
+				var scale:Number = event.delta / 10;
+				cont.scaleX += scale;
+				cont.scaleY += scale;
+			}
+			
+			private function onMouseDown(event:MouseEvent):void
+			{
+				stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp, false, 0, true);
+				
+				cont.startDrag();
+			}
+			
+			private function onStageMouseUp(event:MouseEvent):void
+			{
+				stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+				
+				cont.stopDrag();
+			}
+		]]>
+	</mx:Script>
+</mx:HBox>

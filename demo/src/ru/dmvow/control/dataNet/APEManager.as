@@ -66,7 +66,7 @@ package ru.dmvow.control.dataNet
 				AlignEngine.align(target);
 			}
 			
-			if (totalItems < 100)
+			if (totalItems < 130)
 				timer.start();
 			APEngine.step(false);
 			APEngine.paint();
@@ -160,7 +160,7 @@ package ru.dmvow.control.dataNet
 		{
 			if (!paused)
 			{
-				APEngine.step(false);
+				APEngine.step(true);
 				APEngine.paint();
 				
 				slowerMotion();

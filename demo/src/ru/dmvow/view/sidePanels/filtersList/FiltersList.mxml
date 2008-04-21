@@ -205,5 +205,5 @@
 			enabled="{!model.processingList.working}"/>
 	</mx:HBox>
 	
-	<filters:FiltersListController model="{model}" filtersList="{this}"/>
+	<filters:FiltersListController model="{model}" filtersList="{this}" dmvowModel="{dmvowModel}"/>
 </mx:Panel>
