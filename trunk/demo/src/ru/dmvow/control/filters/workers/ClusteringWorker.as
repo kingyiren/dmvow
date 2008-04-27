@@ -2,6 +2,8 @@ package ru.dmvow.control.filters.workers
 {
 import flash.utils.Dictionary;
 
+import mx.collections.ArrayCollection;
+
 import ru.dmvow.model.DataModel;
 import ru.dmvow.model.common.IData;
 import ru.dmvow.model.common.IItem;
@@ -43,6 +45,16 @@ public class ClusteringWorker extends AbstractWorker
 	public static function get lastInstance():ClusteringWorker
 	{
 		return _lastInstance;
+	}
+	
+	public function clusterEntered(value:Cluster):void
+	{
+		iData.dataModel.modelRules.source = value.rulesChildren;
+		iData.dataModel.modelRules.refresh();
+		
+		paused = false;
+		
+		dmvowModel.currentState = DMVoWModel.COMMON_STATE;
 	}
 	
 	override protected function commonProcessActions():void
@@ -355,8 +367,8 @@ public class ClusteringWorker extends AbstractWorker
 			resulting.push(p);
 				
 		var prediction:Number = dataModel.supportTree.getSupportTreeValue(resulting);
-		if (prediction == 0)
-			prediction = rule1.ruleSupport * rule2.ruleSupport;
+		//if (prediction == 0)
+		//	prediction = rule1.ruleSupport * rule2.ruleSupport;
 			
 		return prediction;
 	}

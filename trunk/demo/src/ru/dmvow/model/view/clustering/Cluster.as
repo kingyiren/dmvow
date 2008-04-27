@@ -1,10 +1,12 @@
 package ru.dmvow.model.view.clustering
 {
+import mx.collections.ArrayCollection;
+
 import ru.dmvow.model.common.IRule;
 
 public class Cluster
 {
-	public var clusterChildren:Array = new Array();
+	public var clusterChildren:ArrayCollection = new ArrayCollection();
 	public var rulesChildren:Array = new Array();
 	[Bindable]
 	public var height:Number = 0;
@@ -25,20 +27,20 @@ public class Cluster
 	{
 		if (rule)
 		{
-			clusterChildren.push(rule);
+			//clusterChildren.addItem(rule);
 			rulesChildren.push(rule);
 		}
 	}
 	
 	public function addChild(cluster:Cluster):void
 	{
-		clusterChildren.push(cluster);
+		clusterChildren.addItem(cluster);
 		rulesChildren = rulesChildren.concat(cluster.rulesChildren);
 	}
 	
 	public function hasChild(cluster:Cluster):Boolean
 	{
-		return (clusterChildren.indexOf(cluster) >= 0);
+		return (clusterChildren.source.indexOf(cluster) >= 0);
 	}
 	
 	public function ruleAt(index:Number):IRule
@@ -53,7 +55,7 @@ public class Cluster
 	
 	public function get simple():Boolean
 	{
-		return (clusterChildren.length == 1);
+		return (clusterChildren.length <= 1);
 	}
 }
 }
