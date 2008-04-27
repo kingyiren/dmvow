@@ -13,6 +13,7 @@
 	horizontalScrollPolicy="off"
 	verticalScrollPolicy="off"
 	creationComplete="onCreationComplete(event)"
+	includeInLayout="false"
 	>
 	<mx:Metadata>
 		[Event(name="minimize", type="ru.dmvow.view.cluster.ClusterEvent")]
@@ -98,6 +99,7 @@
 						paddingLeft="0"
 						paddingRight="0"
 						paddingTop="0"
+						visible="false"
 						/>
 					<mx:Button
 						x="{discardButton.x + discardButton.width + 3}"
@@ -122,6 +124,7 @@
 						paddingLeft="0"
 						paddingRight="0"
 						paddingTop="0"
+						click="onEnterClick(event);"
 						/>
 				</mx:Canvas>
 			</mx:AddChild>
@@ -133,6 +136,7 @@
 			import ru.dmvow.model.view.clustering.Cluster;
 			
 			public static const WIDTH:Number = 208;
+			public static const HPADDING:Number = 30;
 			public static const HEIGHT:Number = 152;
 			public static const COMMON_STATE:String = "commonState";
 			public static const MIN_STATE:String = "minState";
@@ -177,8 +181,7 @@
 						if (index < 0)
 							throw new Error("Error.");
 						
-						trace("index: " + index);
-						x = index * (WIDTH + 30);
+						x = index * (WIDTH + HPADDING);
 						y = - _cluster.height * ClusterView.totalHeight;
 						inPlace = true;
 					}
@@ -192,7 +195,8 @@
 				
 				visible = true;
 				
-				childLink.show();
+				if (childLink)
+					childLink.show();
 			}
 			
 			public function hide():void
@@ -202,7 +206,8 @@
 					
 				visible = false;
 				
-				childLink.hide();
+				if (childLink)
+					childLink.hide();
 			}
 			
 			[Bindable]
@@ -224,11 +229,22 @@
 			private function onMinimizeClick(event:Event):void
 			{
 				currentState = MIN_STATE;
+				
+				if (childLink)
+					childLink.hide();
 			}
 			
 			private function onMaximizeClick(event:Event):void
 			{
 				currentState = COMMON_STATE;
+				
+				if (childLink)
+					childLink.show();
+			}
+			
+			private function onEnterClick(event:Event):void
+			{
+				dispatchEvent(new ClusterEvent(ClusterEvent.ENTER, true));
 			}
 		]]>
 	</mx:Script>

@@ -20,18 +20,53 @@
 		paddingRight="5"
 		paddingTop="5">
 		<!--<cluster:CContainer id="cont"/>-->
-		<mx:Canvas id="cont"/>
+		<mx:TabNavigator width="100%" height="100%">
+			<mx:Canvas id="cont" label="Graph view"/>
+			<mx:Canvas label="Table view" width="100%" height="100%">
+				<mx:AdvancedDataGrid width="100%" height="100%">
+					<mx:dataProvider>
+						<mx:HierarchicalData source="{cluster}" childrenField="clusterChildren"/>
+					</mx:dataProvider>
+			        <mx:columns>
+			            <mx:AdvancedDataGridColumn 
+			            	dataField="clusterChildren" 
+			            	labelFunction="{aDGLabelFunction}" 
+			            	width="300" 
+			            	sortable="false"/>
+			            <mx:AdvancedDataGridColumn dataField="level" headerText="Enter?" width="50" sortable="false"/> <!-- for "Enter" button -->
+			            <mx:AdvancedDataGridColumn dataField="size" width="50"/>
+			            <mx:AdvancedDataGridColumn dataField="level" width="50" sortable="false"/>
+			            <mx:AdvancedDataGridColumn dataField="height" width="50"/>
+			            <mx:AdvancedDataGridColumn dataField="avgSupport" width="50"/>
+			            <mx:AdvancedDataGridColumn dataField="avgConfidence" width="50"/>
+			            <mx:AdvancedDataGridColumn dataField="avgLift" width="50"/>
+			        </mx:columns>
+				    <mx:rendererProviders>            
+				        <mx:AdvancedDataGridRendererProvider 
+				            dataField="level" 
+				            renderer="ru.dmvow.view.cluster.EnterButton" 
+				            columnIndex="1"/>         
+				    </mx:rendererProviders>   
+				</mx:AdvancedDataGrid>
+			</mx:Canvas>
+		</mx:TabNavigator>
 	</mx:Panel>
 	<mx:Script>
 		<![CDATA[
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+			import ru.dmvow.control.filters.workers.ClusteringWorker;
 			import mx.containers.Canvas;
 			import mx.core.UIComponent;
 			import ru.dmvow.model.view.clustering.Cluster;
+			
+			private static const MAX_SCALE:Number = 1;
+			private static const MIN_SCALE:Number = 0.05;
 			
 			private static var _cluster:Cluster;
 			private var singleClusterView:SingleClusterView;
 			private var inited:Boolean = false;
 			private var zeroLevelIndex:Number = 0;
+			private var _scale:Number = 1;
 			
 			public static function get totalHeight():Number
 			{
@@ -65,6 +100,8 @@
 						zeroLevelIndex = 0;
 						singleClusterView = addClusterTree(_cluster);
 						singleClusterView.draw();
+						
+						toStandartView();
 					}
 				}
 			}
@@ -80,7 +117,7 @@
 				}
 				cont.addChild(singleCluster);
 				
-				if (value.clusterChildren.length > 1)
+				if (value.clusterChildren.length > 1 && !(value.clusterChildren[0] as Cluster).simple)
 				{
 					var link:ClusterLink = new ClusterLink();
 					singleCluster.childLink = link;
@@ -100,6 +137,80 @@
 				return singleCluster;
 			}
 			
+			private function toStandartView():void
+			{
+				var contWidth:Number = zeroLevelIndex * (SingleClusterView.WIDTH + SingleClusterView.HPADDING);
+				var contHeight:Number = totalHeight * 2 - SingleClusterView.HEIGHT;
+				
+				var viewScale:Number = Math.min(panelCont.width / contWidth, panelCont.height / contHeight);
+				if (viewScale > MAX_SCALE)
+					viewScale = MAX_SCALE;
+				
+				if (viewScale < MIN_SCALE)
+					viewScale = MIN_SCALE;
+					
+				cont.scaleX = 
+				cont.scaleY = viewScale;
+				
+				_scale = viewScale;
+				
+				cont.x = (panelCont.width - (contWidth * viewScale))/2;
+				cont.y = (panelCont.height - (contHeight * viewScale))/2;
+			}
+			
+			private function aDGLabelFunction(item:Object, column:AdvancedDataGridColumn):String
+			{
+				var cluster:Cluster = item as Cluster;
+				if (cluster.rulesChildren.length > 1)
+					return "Level " + cluster.level;
+				else if (cluster.rulesChildren.length == 1)
+				{
+					var str1:String = cluster.rulesChildren[0].toString();
+					var str2:String = str1.split("\n").join(" ");
+					return str2;
+				}
+				else
+					return "";
+			}
+			
+			private function get scale():Number
+			{
+				return _scale;
+			}
+			
+			private function set scale(value:Number):void
+			{
+				if (value > MAX_SCALE)
+					value = MAX_SCALE;
+				if (value < MIN_SCALE)
+					value = MIN_SCALE;
+				
+				if (_scale == value)
+					return;
+				
+				var mult:Number = value / _scale; 
+				
+				_scale = value;
+				
+				var pBefore:Point = new Point(cont.mouseX, cont.mouseY);
+				pBefore = cont.localToGlobal(pBefore);
+				pBefore = panelCont.globalToContent(pBefore);
+				
+				cont.scaleX = _scale;
+				cont.scaleY = _scale;
+				
+				var pAfter:Point = new Point(cont.mouseX * mult, cont.mouseY * mult);
+				pAfter = cont.localToGlobal(pAfter);
+				pAfter = panelCont.globalToContent(pAfter);
+				
+				cont.x += pBefore.x - pAfter.x;
+				cont.y += pBefore.y - pAfter.y;
+			}
+			
+			///////////////////////////////////////////////////////////////////////////////////
+			// Еvent handlers
+			///////////////////////////////////////////////////////////////////////////////////
+			
 			private function onCreationComplete(event:Event):void
 			{
 				inited = true;
@@ -113,13 +224,14 @@
 				
 				addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, false, 0, true);
 				addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
+				addEventListener(ClusterEvent.ENTER, onClusterEnter, false, 0, true);
 			}
 			
 			private function onMouseWheel(event:MouseEvent):void
 			{
-				var scale:Number = event.delta / 10;
-				cont.scaleX += scale;
-				cont.scaleY += scale;
+				var dScale:Number = event.delta / 20;
+				
+				scale += dScale;
 			}
 			
 			private function onMouseDown(event:MouseEvent):void
@@ -134,6 +246,17 @@
 				stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
 				
 				cont.stopDrag();
+			}
+			
+			private function onClusterEnter(event:ClusterEvent):void
+			{
+				var singleClusterView:SingleClusterView = (event.target as SingleClusterView);
+				var clusterEntered:Cluster;
+				if (singleClusterView)
+					clusterEntered = singleClusterView.cluster;
+				else
+					clusterEntered = event.target.data;
+				ClusteringWorker.lastInstance.clusterEntered(clusterEntered);
 			}
 		]]>
 	</mx:Script>
