@@ -8,6 +8,7 @@ package ru.dmvow.model.view.dataNet
 		public static const RULES_VIEW:String = "rules_view";
 		
 		public var viewType:String;
+		[Bindable]
 		public var data:IData;
 		
 		public function get viewTitle():String

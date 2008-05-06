@@ -7,6 +7,7 @@
 	width="100%"
 	height="100%"
 	paddingTop="5" 
+	resize="onResize(event)"
 	xmlns:cluster="ru.dmvow.view.cluster.*"
 	creationComplete="onCreationComplete(event)"
 	>
@@ -20,10 +21,17 @@
 		paddingRight="5"
 		paddingTop="5">
 		<!--<cluster:CContainer id="cont"/>-->
-		<mx:TabNavigator width="100%" height="100%">
-			<mx:Canvas id="cont" label="Graph view"/>
+		<mx:TabNavigator id="tabNavigator" width="100%" height="100%" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+			<mx:Canvas id="controls" width="100%" height="100%" label="Graph view" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+				<mx:UIComponent id="_mask" addedToStage="onMaskAddedToStage(event)"/>
+				<mx:Canvas id="cont" mask="{_mask}" horizontalScrollPolicy="off" verticalScrollPolicy="off"/>
+				<mx:VBox id="controlsVBox" right="10" horizontalAlign="center">
+					<mx:VSlider id="vSlider" labels="['overview', 'concrete']" showTrackHighlight="true" value="{scale}" change="scale = vSlider.value;" minimum="{MIN_SCALE}" maximum="{MAX_SCALE}"/>
+					<mx:Button label="View All" click="{toStandartView();}"/>
+				</mx:VBox>
+			</mx:Canvas>
 			<mx:Canvas label="Table view" width="100%" height="100%">
-				<mx:AdvancedDataGrid width="100%" height="100%">
+				<mx:AdvancedDataGrid id="adg" width="100%" height="100%">
 					<mx:dataProvider>
 						<mx:HierarchicalData source="{cluster}" childrenField="clusterChildren"/>
 					</mx:dataProvider>
@@ -53,6 +61,7 @@
 	</mx:Panel>
 	<mx:Script>
 		<![CDATA[
+			import mx.collections.HierarchicalData;
 			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
 			import ru.dmvow.control.filters.workers.ClusteringWorker;
 			import mx.containers.Canvas;
@@ -102,6 +111,8 @@
 						singleClusterView.draw();
 						
 						toStandartView();
+						
+						tabNavigator.selectedIndex = 0;
 					}
 				}
 			}
@@ -140,9 +151,9 @@
 			private function toStandartView():void
 			{
 				var contWidth:Number = zeroLevelIndex * (SingleClusterView.WIDTH + SingleClusterView.HPADDING);
-				var contHeight:Number = totalHeight * 2 - SingleClusterView.HEIGHT;
+				var contHeight:Number = totalHeight * 2 - 2 * SingleClusterView.HEIGHT;
 				
-				var viewScale:Number = Math.min(panelCont.width / contWidth, panelCont.height / contHeight);
+				var viewScale:Number = Math.min((panelCont.width - 20) / contWidth, (panelCont.height - 50) / contHeight);
 				if (viewScale > MAX_SCALE)
 					viewScale = MAX_SCALE;
 				
@@ -152,10 +163,10 @@
 				cont.scaleX = 
 				cont.scaleY = viewScale;
 				
-				_scale = viewScale;
+				scale = viewScale;
 				
-				cont.x = (panelCont.width - (contWidth * viewScale))/2;
-				cont.y = (panelCont.height - (contHeight * viewScale))/2;
+				cont.x = ((panelCont.width - 20) - (contWidth * viewScale))/2;
+				cont.y = ((panelCont.height - 50) - (contHeight * viewScale))/2;
 			}
 			
 			private function aDGLabelFunction(item:Object, column:AdvancedDataGridColumn):String
@@ -173,6 +184,7 @@
 					return "";
 			}
 			
+			[Bindable]
 			private function get scale():Number
 			{
 				return _scale;
@@ -205,6 +217,12 @@
 				
 				cont.x += pBefore.x - pAfter.x;
 				cont.y += pBefore.y - pAfter.y;
+				
+				invalidateDisplayList();
+				invalidateProperties();
+				invalidateSize();
+				
+				validateDisplayList();
 			}
 			
 			///////////////////////////////////////////////////////////////////////////////////
@@ -222,23 +240,29 @@
 					cluster = t;
 				}
 				
-				addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, false, 0, true);
-				addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
+				panelCont.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown, false, 0, true);
+				panelCont.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
 				addEventListener(ClusterEvent.ENTER, onClusterEnter, false, 0, true);
 			}
 			
 			private function onMouseWheel(event:MouseEvent):void
 			{
-				var dScale:Number = event.delta / 20;
-				
-				scale += dScale;
+				if (!controlsVBox.contains(event.target as DisplayObject))
+				{
+					var dScale:Number = event.delta / 20;
+					
+					scale += dScale;
+				}
 			}
 			
 			private function onMouseDown(event:MouseEvent):void
 			{
-				stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp, false, 0, true);
-				
-				cont.startDrag();
+				if (!controlsVBox.contains(event.target as DisplayObject))
+				{
+					stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp, false, 0, true);
+					
+					cont.startDrag();
+				}
 			}
 			
 			private function onStageMouseUp(event:MouseEvent):void
@@ -257,6 +281,22 @@
 				else
 					clusterEntered = event.target.data;
 				ClusteringWorker.lastInstance.clusterEntered(clusterEntered);
+			}
+			
+			private function onMaskAddedToStage(event:Event):void
+			{
+				onResize(null);
+			}
+			
+			private function onResize(event:Event):void
+			{
+				if (_mask)
+				{
+					_mask.graphics.clear();
+					_mask.graphics.beginFill(0xFFCC00, 1);
+					_mask.graphics.drawRect(0, 0, controls.width, controls.height);
+					_mask.graphics.endFill();
+				}
 			}
 		]]>
 	</mx:Script>

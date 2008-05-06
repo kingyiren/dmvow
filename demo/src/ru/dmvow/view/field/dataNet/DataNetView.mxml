@@ -28,9 +28,11 @@
 			
 			protected static const ERROR_STATE:String = "error_state";
 			protected static const EMPTY_STATE:String = "empty_state";
+			protected static const ASK_STATE:String = "ask_state";
 			protected static const BUILDING_NET_STATE:String = "building_net_state";
 			protected static const BUILDING_VIEW_STATE:String = "building_view_state";
 			protected static const VIEW_STATE:String = "view_state";
+			protected static const MAX_IMMEDIATE_RULES_TO_SHOW:Number = 200; 
 			
 			protected var inited:Boolean = false;
 			protected var dragging:Boolean = false;
@@ -116,8 +118,15 @@
 				
 				if (!upToDate)
 				{
-					currentState = BUILDING_NET_STATE;
-					dataNetBuilders.build(preBuildDataNet);
+					if (preBuildDataNet.data.dataModel.modelRules.length > MAX_IMMEDIATE_RULES_TO_SHOW)
+					{
+						currentState = ASK_STATE;
+						//askButton.label = 'Show ' + preBuildDataNet.data.dataModel.modelRules.length + ' rules';
+					}
+					else
+					{
+						onShowAllClick(null);
+					}	
 				}
 				else
 				{
@@ -253,6 +262,12 @@
 				container.scaleX += scaleDelta;
 				container.scaleY += scaleDelta;
 			}
+			
+			protected function onShowAllClick(event:Event):void
+			{
+				currentState = BUILDING_NET_STATE;
+				dataNetBuilders.build(preBuildDataNet);
+			}
 		]]>
 	</mx:Script>
 	<mx:states>
@@ -264,6 +279,19 @@
 		<mx:State name="{ERROR_STATE}">
 			<mx:AddChild>
 				<common:MessageView id="error" label="Error."/>
+			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{ASK_STATE}">
+			<mx:AddChild>
+				<mx:Text 
+					horizontalCenter="0" 
+					verticalCenter="-60"
+					width="200"
+					textAlign="center" 
+					htmlText="{'This control is going to show the vizualization of &lt;b&gt;' + preBuildDataNet.data.dataModel.modelRules.length + '&lt;/b&gt; rules. It will be slow and the picture will be hard to understand. Maybe, it will be better to apply one more filter?'}"/>
+			</mx:AddChild>
+			<mx:AddChild>
+				<mx:Button id="askButton" label="Show anyway" horizontalCenter="0" verticalCenter="0" click="onShowAllClick(event);"/>
 			</mx:AddChild>
 		</mx:State>
 		<mx:State name="{BUILDING_NET_STATE}">
