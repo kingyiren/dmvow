@@ -44,12 +44,14 @@
 				<mx:Canvas>
 					<mx:Label 
 						id="mainLabel" 
+						truncateToFit="false"
 						x="3" 
 						y="0" 
 						styleName="myLabel"
 						text="{'Level ' + cluster.level.toString()}" fontWeight="bold"/>
 					<mx:Label 
 						id="subLabel" 
+						truncateToFit="false"
 						x="{mainLabel.x}" 
 						y="{mainLabel.y + mainLabel.height - 8}" 
 						styleName="myLabel"
@@ -58,6 +60,7 @@
 					<mx:Label
 						x="{supportBar.x + supportBar.width}"
 						y="{supportBar.y - 4}"
+						truncateToFit="false"
 						styleName="myLabel"
 						text="{'S: ' + cluster.avgSupport.toFixed(2)}"
 						color="{supportBar.color}"/>
@@ -65,6 +68,7 @@
 					<mx:Label
 						x="{confidenceBar.x + confidenceBar.width}"
 						y="{confidenceBar.y - 4}"
+						truncateToFit="false"
 						styleName="myLabel"
 						text="{'C: ' + cluster.avgConfidence.toFixed(2)}"
 						color="{confidenceBar.color}"/>
@@ -72,6 +76,7 @@
 					<mx:Label
 						x="{liftBar.x + liftBar.width}"
 						y="{liftBar.y - 4}"
+						truncateToFit="false"
 						styleName="myLabel"
 						text="{'L: ' + cluster.avgLift.toFixed(2)}"
 						color="{liftBar.color}"/>
@@ -79,15 +84,10 @@
 					<mx:Text
 						x="3"
 						y="45"
+						truncateToFit="false"
 						fontStyle="italic"
-						text="{'Most fequent antecedent items:\n' + cluster.mostFrequentAntecedentItems.join(', ')}"/>
-						
-					<mx:Text
-						x="3"
-						y="85"
-						fontStyle="italic"
-						text="{'Most fequent consequent items:\n' + cluster.mostFrequentConsequentItems.join(', ')}"/>
-						
+						width="{WIDTH - 6}"
+						text="{cluster.mostFrequentAntecedentItems.join(', ') + ' -> ' + cluster.mostFrequentConsequentItems.join(', ')}"/>
 					<mx:Button
 						x="52"
 						y="127"
@@ -136,7 +136,7 @@
 			import ru.dmvow.model.view.clustering.Cluster;
 			
 			public static const WIDTH:Number = 208;
-			public static const HPADDING:Number = 30;
+			public static const HPADDING:Number = 15;
 			public static const HEIGHT:Number = 152;
 			public static const COMMON_STATE:String = "commonState";
 			public static const MIN_STATE:String = "minState";

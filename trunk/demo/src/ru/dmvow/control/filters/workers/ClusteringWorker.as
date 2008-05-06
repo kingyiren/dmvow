@@ -2,8 +2,6 @@ package ru.dmvow.control.filters.workers
 {
 import flash.utils.Dictionary;
 
-import mx.collections.ArrayCollection;
-
 import ru.dmvow.model.DataModel;
 import ru.dmvow.model.common.IData;
 import ru.dmvow.model.common.IItem;
@@ -33,6 +31,11 @@ public class ClusteringWorker extends AbstractWorker
 		super();
 	}
 	
+	public static function get lastInstance():ClusteringWorker
+	{
+		return _lastInstance;
+	}
+	
 	override public function start(previousStepData:IData, processingListItem:ProcessingListItem, dmvowModel:DMVoWModel = null):void
 	{
 		this.dmvowModel = dmvowModel;
@@ -40,11 +43,6 @@ public class ClusteringWorker extends AbstractWorker
 		this.filterItem = processingListItem as ClusterFilterItem;
 		
 		startProcess();
-	}
-	
-	public static function get lastInstance():ClusteringWorker
-	{
-		return _lastInstance;
 	}
 	
 	public function clusterEntered(value:Cluster):void
@@ -62,15 +60,16 @@ public class ClusteringWorker extends AbstractWorker
 		iData = previousStepData.clone();
 
 		maxCounter = 1;
+	}
+	
+	override protected function processIteration():void
+	{
 		
 		// Do all the work here
 		checkSupportTree();
 		
 		buildClusterTree();
-	}
-	
-	override protected function processIteration():void
-	{
+		
 		// Pause the process to wait for user's cluster choise.
 		paused = true;
 		
@@ -179,6 +178,7 @@ public class ClusteringWorker extends AbstractWorker
 		{
 			rule = IRule(rules[i]);
 			tCluster1 = new Cluster(rule);
+			workOnProperties(tCluster1);
 			currLevelClusters.push(tCluster1); 
 		}
 		
@@ -248,14 +248,8 @@ public class ClusteringWorker extends AbstractWorker
 			for (i = 0; i < nextLevelClusters.length; i++)
 			{
 				tCluster1 = Cluster(nextLevelClusters[i]);
-				tCluster1.height = clusterHeight(tCluster1);
 				tCluster1.level = currLevel;
-				var someRule:IRule = tCluster1.rulesChildren[tCluster1.rulesChildren.length - 1];
-				tCluster1.avgSupport = someRule.ruleSupport;
-				tCluster1.avgConfidence = someRule.ruleConfidence;
-				tCluster1.avgLift = someRule.ruleLift;
-				tCluster1.mostFrequentAntecedentItems.push(someRule.ruleAntecedent.itemsetItems.getItemAt(0));
-				tCluster1.mostFrequentConsequentItems.push(someRule.ruleConsequent.itemsetItems.getItemAt(0));
+				workOnProperties(tCluster1);
 			}
 			
 			currLevel++;
@@ -299,6 +293,85 @@ public class ClusteringWorker extends AbstractWorker
 		}
 		
 		return result;
+	}
+	
+	private function workOnProperties(cluster:Cluster):void
+	{
+		if (cluster.simple)
+		{
+			var onlyRule:IRule = cluster.rulesChildren[0] as IRule;
+			
+			cluster.height = 0;
+			cluster.avgSupport = onlyRule.ruleSupport; 
+			cluster.avgConfidence = onlyRule.ruleConfidence;
+			cluster.avgLift = onlyRule.ruleLift;
+			cluster.mostFrequentAntecedentItems = onlyRule.ruleAntecedent.itemsetItems.source;
+			cluster.mostFrequentConsequentItems = onlyRule.ruleConsequent.itemsetItems.source;
+		}
+		else
+		{
+			cluster.height = clusterHeight(cluster);
+			
+			var avgSupport:Number = 0;
+			var avgConfidence:Number = 0;
+			var avgLift:Number = 0;
+			var antItems:Array = new Array();
+			var consItems:Array = new Array();
+			var antDict:Dictionary = new Dictionary(true);
+			var consDict:Dictionary = new Dictionary(true);
+			var childrenLenght:Number = cluster.clusterChildren.length;
+			for (var i:Number = 0; i < childrenLenght; i++)
+			{
+				var childCluster:Cluster = cluster.clusterChildren.getItemAt(i) as Cluster;
+				avgSupport += childCluster.avgSupport;
+				avgConfidence += childCluster.avgConfidence;
+				avgLift += childCluster.avgLift;
+				
+				for (var j:Number = 0; j < childCluster.mostFrequentAntecedentItems.length; j++)
+				{
+					var item:Object = childCluster.mostFrequentAntecedentItems[j];
+					if (antDict[item] === undefined)
+						antDict[item] = 1;
+					else
+						antDict[item]++;
+				}
+				
+				for (j = 0; j < childCluster.mostFrequentConsequentItems.length; j++)
+				{
+					item = childCluster.mostFrequentConsequentItems[j];
+					if (consDict[item] === undefined)
+						consDict[item] = 1;
+					else
+						consDict[item]++;
+				}
+			}
+			
+			var antArr:Array = new Array();
+			for (var p:Object in antDict)
+				antArr.push(new ClusterSO(Number(antDict[p]), p));
+			antArr = antArr.sortOn("value", Array.DESCENDING);
+			antItems.push(antArr[0].obj);
+			if (antArr.length > 1)
+				antItems.push(antArr[1].obj);
+				
+			var consArr:Array = new Array();
+			for (p in consDict)
+				consArr.push(new ClusterSO(Number(consDict[p]), p));
+			consArr = consArr.sortOn("value", Array.DESCENDING);
+			consItems.push(consArr[0].obj);
+			if (consArr.length > 1)
+				consItems.push(consArr[1].obj);
+			
+			avgConfidence /= childrenLenght;
+			avgLift /= childrenLenght;
+			avgSupport /= childrenLenght;
+			
+			cluster.avgSupport = avgSupport;
+			cluster.avgConfidence = avgConfidence;
+			cluster.avgLift = avgLift;
+			cluster.mostFrequentAntecedentItems = antItems;
+			cluster.mostFrequentConsequentItems = consItems;
+		}
 	}
 	
 	private function clusterHeight(cluster:Cluster):Number

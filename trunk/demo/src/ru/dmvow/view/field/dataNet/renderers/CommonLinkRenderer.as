@@ -1,5 +1,6 @@
 package ru.dmvow.view.field.dataNet.renderers
 {
+	import flash.display.Graphics;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
@@ -42,7 +43,12 @@ package ru.dmvow.view.field.dataNet.renderers
 		{
 			var start:Vector = new Vector(p1.px, p1.py);
 			var delta:Vector = new Vector(p2.px - p1.px, p2.py - p1.py);
-			delta.multEquals(0.8);
+			var delta1:Vector = delta.mult(0.65);
+			var delta2:Vector = delta1.mult(1 / delta1.magnitude()).multEquals(10);
+			var delta3:Vector = delta1.plus(delta2);
+			var t:Number = delta2.x;
+			delta2.x = - delta2.y;
+			delta2.y = t;
 			
 			if (!initialized)
 			{
@@ -50,23 +56,29 @@ package ru.dmvow.view.field.dataNet.renderers
 				sprite.addEventListener(MouseEvent.MOUSE_OVER, onSpriteOver, false, 0, true);
 				sprite.addEventListener(MouseEvent.CLICK, onSpriteClick, false, 0, true);
 				sprite.addEventListener(MouseEvent.MOUSE_OUT, onSpriteOut, false, 0, true);
-				sprite.stage.addEventListener(MouseEvent.CLICK, onStageClick, false, 0, true);
+				if (sprite.stage)
+					sprite.stage.addEventListener(MouseEvent.CLICK, onStageClick, false, 0, true);
 			}
 			
+			var sGraphics:Graphics = sprite.graphics;
 			// Drawing the line itself
-			sprite.graphics.clear();
-			sprite.graphics.lineStyle(lineThickness, lineColor, lineAlpha);
-			sprite.graphics.moveTo(p1.px, p1.py);
-			sprite.graphics.lineTo(p1.px + delta.x, p1.py + delta.y);
-			// Drawing the green end
-			sprite.graphics.lineStyle(lineThickness, 0x00FF00, lineAlpha);
-			sprite.graphics.lineTo(p2.px, p2.py);
+			sGraphics.clear();
+			sGraphics.lineStyle(lineThickness, lineColor, lineAlpha);
+			sGraphics.moveTo(p1.px, p1.py);
+			sGraphics.lineTo(p2.px, p2.py);
+			
+			sGraphics.moveTo(p1.px + delta3.x, p1.py + delta3.y);
+			sGraphics.lineTo(p1.px + delta1.x + delta2.x, p1.py + delta1.y + delta2.y);
+			
+			delta2.multEquals(-1);
+			sGraphics.moveTo(p1.px + delta3.x, p1.py + delta3.y);
+			sGraphics.lineTo(p1.px + delta1.x + delta2.x, p1.py + delta1.y + delta2.y);
 			// Drawing the opaque background
 			if (lineThickness < 7)
 			{
-				sprite.graphics.lineStyle(7, 0x000000, 0);
-				sprite.graphics.moveTo(p1.px, p1.py);
-				sprite.graphics.lineTo(p2.px, p2.py);
+				sGraphics.lineStyle(7, 0x000000, 0);
+				sGraphics.moveTo(p1.px, p1.py);
+				sGraphics.lineTo(p2.px, p2.py);
 			}
 		}
 		
