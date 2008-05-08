@@ -53,7 +53,7 @@ public class ItemsFilterWorker extends AbstractWorker
 		// For rules we will collect indexes to delete through "rulesLength"
 		// iterations and then delete them in "rulesLength + 1" iteration.
 		// The same thing with itemsets and items. 
-		maxCounter = rulesLength + 1 + 1 + 1;
+		maxCounter = rulesLength + 1;
 		
 		// Starting with processing rules.
 		currentTarget = RULES; 
@@ -96,6 +96,10 @@ public class ItemsFilterWorker extends AbstractWorker
 			{
 				iData.dataModel.modelRules.source.splice(rulesToDelete[i], 1);
 			}
+			
+			rulesToDelete = new Array();
+			
+			currentTarget = "";
 		}
 	} 
 	
@@ -141,10 +145,14 @@ public class ItemsFilterWorker extends AbstractWorker
 		
 		for (var i:Number = 0; i < itemset.itemsetItems.length; i++)
 		{
-			if (pattern.itemName == (itemset.itemsetItems.source[i] as IItem).itemName)
+			var item:IItem = IItem(itemset.itemsetItems.source[i]);
+			if (pattern.itemName == item.itemName)
 			{
-				hasItem = true;
-				break;
+				if (!pattern.itemValue || pattern.itemValue == item.itemValue)
+				{
+					hasItem = true;
+					break;
+				}
 			}
 		}
 		

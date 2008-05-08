@@ -21,7 +21,7 @@
 				<itemsFilter:SideList 
 					id="leftSideList" 
 					dataProvider="{itemsFilterItem.leftSide}" 
-					width="200" 
+					width="280" 
 					height="140" 
 					dropEnabled="true" 
 					dragMoveEnabled="true" 
@@ -34,7 +34,7 @@
 				<itemsFilter:SideList 
 					id="rightSideList" 
 					dataProvider="{itemsFilterItem.rightSide}" 
-					width="200" 
+					width="280" 
 					height="140" 
 					dropEnabled="true" 
 					dragMoveEnabled="true" 
@@ -52,6 +52,8 @@
 	</mx:VBox>
 	<mx:Script>
 		<![CDATA[
+			import ru.dmvow.model.common.IItem;
+			import ru.dmvow.model.view.processingList.items.itemsFilter.ItemPattern;
 			import mx.events.DragEvent;
 			import mx.managers.PopUpManager;
 			import mx.collections.SortField;
@@ -93,20 +95,44 @@
 			{
 				_items = value;
 				
-				// Creating a copy
+				// We need to fill itemNames:ArrayCollection to show,
+				// what kind of items we have in the model.
+				// Also we need to fill the ItemPattern.itemValues array.
 				var copy:Array = value.source.concat();
 				copy.sortOn("itemName");
 				
-				trace("copy: " + copy);
-				for (var i:Number = copy.length - 1; i > 0; i--)
+				var itemValues:Array =
+				ItemPattern.itemValues = new Array();
+				
+				for (var i:Number = copy.length - 1; i >= 0; i--)
 				{
-					if (copy[i].itemName == copy[i - 1].itemName)
-						copy.splice(i, 1); 
+					var copyCurr:IItem = IItem(copy[i]);
+					var copyPrev:IItem = copy[i - 1] as IItem;
+					var iItemName:String = copyCurr.itemName;
+					
+					if (!itemValues[iItemName])
+					{
+						itemValues[iItemName] = new Array();
+					}
+					
+					(itemValues[iItemName] as Array).push(copyCurr.itemValue);
+					
+					if (copyPrev)
+					{
+						if (iItemName == copyPrev.itemName)
+							copy.splice(i, 1);
+					} 
 				}
 				
-				trace("\n\ncopy: " + copy);
+				// Sort by names and add ItemPattern.ANY_STRING.
+				for (var p:String in itemValues)
+				{
+					(itemValues[p] as Array).sort();
+					(itemValues[p] as Array).splice(0, 0, ItemPattern.ANY_STRING);
+				}
+				
 				var onlyNamesArray:Array = new Array();
-				for (i = 0; i < copy.length - 1; i++)
+				for (i = 0; i < copy.length; i++)
 				{
 					onlyNamesArray.push(copy[i].itemName);
 				}

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	title="Edit clustering filter" 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	paddingTop="5"
+	paddingRight="5"
+	paddingBottom="5"
+	paddingLeft="5"
+	creationComplete="onCreationComplete(event)"
+	layout="vertical">
+	<mx:Metadata>
+		[Event(name="save", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent")]
+		[Event(name="cancel", type="ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent")]
+	</mx:Metadata>
+	<mx:Script>
+		<![CDATA[
+			import ru.dmvow.model.view.processingList.items.clusterFilter.ClusterFilterItem;
+			import ru.dmvow.model.view.interestingMeasures.InterestingMeasure;
+			import ru.dmvow.view.sidePanels.filtersList.itemsFilter.EditFilterEvent;
+			import ru.dmvow.model.view.processingList.items.interestingMeasureFilter.InterestingMeasureFilterItem;
+			import mx.events.DragEvent;
+			import mx.managers.PopUpManager;
+			import mx.collections.SortField;
+			import mx.collections.Sort;
+			import mx.collections.ArrayCollection;
+			
+			private var _clusterFilterItem:ClusterFilterItem;
+			private var _newFilter:Boolean;
+			
+			public function set newFilter(value:Boolean):void
+			{
+				_newFilter = value;
+				
+				if (_newFilter)
+					clusterFilterItem = new ClusterFilterItem();
+			}
+			
+			public function get newFilter():Boolean
+			{
+				return _newFilter;
+			}
+			
+			[Bindable]
+			public function set clusterFilterItem(value:ClusterFilterItem):void
+			{
+				_clusterFilterItem = value;
+				
+				measureRBG.selectedValue = _clusterFilterItem.measure;
+			}
+			
+			public function get clusterFilterItem():ClusterFilterItem
+			{
+				return _clusterFilterItem;
+			}
+			
+			private function onCreationComplete(event:Event):void
+			{
+				//measureRBG.selectedValue = _clusterFilterItem.measure;
+			}
+			
+			private function onRadioItemClick(event:Event):void
+			{
+				clusterFilterItem.measure = measureRBG.selectedValue as String;
+			}
+			
+			private function onSave(event:Event):void
+			{
+				var newEvent:EditFilterEvent = new EditFilterEvent(EditFilterEvent.SAVE);
+				dispatchEvent(newEvent);
+			}
+			
+			private function onCancel(event:Event):void
+			{
+				var newEvent:EditFilterEvent = new EditFilterEvent(EditFilterEvent.CANCEL);
+				dispatchEvent(newEvent);
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="400">
+		<mx:Text fontWeight="bold" width="380">
+			<mx:text>In order to proceed with clusterization, please select the measure to use in dimensionless aglomerative clustering algorythm.</mx:text>
+		</mx:Text>
+		<mx:RadioButtonGroup id="measureRBG" itemClick="onRadioItemClick(event)"/>
+		<mx:RadioButton group="{measureRBG}" label="{ClusterFilterItem.SENSE_MEASURE}" value="{ClusterFilterItem.SENSE_MEASURE}"/>
+		<mx:Text paddingLeft="20" width="370">
+			<mx:text>This measure makes rules appear at the same cluster if they are valid over the same transactions.</mx:text>
+		</mx:Text>
+		<mx:Spacer height="10"/>
+		<mx:RadioButton group="{measureRBG}" label="{ClusterFilterItem.ITEMS_MEASURE}" value="{ClusterFilterItem.ITEMS_MEASURE}"/>
+		<mx:Text paddingLeft="20" width="370">
+			<mx:text>This measure makes rules appear at the same cluster if the sets of their items names overlap.</mx:text>
+		</mx:Text>
+		<mx:HBox paddingTop="10">
+			<mx:Button label="Save" click="onSave(event)"/>
+			<mx:Button label="Cancel" click="onCancel(event)"/>
+		</mx:HBox>
+	</mx:VBox>
+</mx:Panel>

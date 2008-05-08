@@ -55,7 +55,7 @@
 						x="{mainLabel.x}" 
 						y="{mainLabel.y + mainLabel.height - 8}" 
 						styleName="myLabel"
-						htmlText="{'Total rules: ' + cluster.size}" fontStyle="italic"/>
+						htmlText="{cluster.size + ' rules total'}" fontStyle="italic"/>
 					<cluster:MiniHBar id="supportBar" value="{cluster.avgSupport}" color="0x437d18" x="122" y="5" width="34" height="10"/>
 					<mx:Label
 						x="{supportBar.x + supportBar.width}"
@@ -72,38 +72,25 @@
 						styleName="myLabel"
 						text="{'C: ' + cluster.avgConfidence.toFixed(2)}"
 						color="{confidenceBar.color}"/>
-					<cluster:MiniHBar id="liftBar" value="{cluster.avgLift}" color="0x1b2a6c" x="122" y="31" width="34" height="10"/>
 					<mx:Label
-						x="{liftBar.x + liftBar.width}"
-						y="{liftBar.y - 4}"
+						x="{122 + 34}"
+						y="{31 - 4}"
 						truncateToFit="false"
 						styleName="myLabel"
 						text="{'L: ' + cluster.avgLift.toFixed(2)}"
-						color="{liftBar.color}"/>
+						color="0x1b2a6c"/>
 						
 					<mx:Text
 						x="3"
 						y="45"
+						selectable="false"
 						truncateToFit="false"
 						fontStyle="italic"
 						width="{WIDTH - 6}"
-						text="{cluster.mostFrequentAntecedentItems.join(', ') + ' -> ' + cluster.mostFrequentConsequentItems.join(', ')}"/>
+						text="{cluster.mostFrequentAntecedentItems.join(', ') + '\n->\n' + cluster.mostFrequentConsequentItems.join(', ')}"/>
 					<mx:Button
-						x="52"
+						x="55"
 						y="127"
-						height="16"
-						id="discardButton"
-						label="Discard"
-						fontWeight="normal"
-						paddingBottom="0"
-						paddingLeft="0"
-						paddingRight="0"
-						paddingTop="0"
-						visible="false"
-						/>
-					<mx:Button
-						x="{discardButton.x + discardButton.width + 3}"
-						y="{discardButton.y}"
 						height="16"
 						id="minimizeButton"
 						label="Minimize"
@@ -113,6 +100,7 @@
 						paddingLeft="0"
 						paddingRight="0"
 						paddingTop="0"
+						width="70"
 						/>
 					<mx:Button
 						x="{minimizeButton.x + minimizeButton.width + 3}"
@@ -124,6 +112,7 @@
 						paddingLeft="0"
 						paddingRight="0"
 						paddingTop="0"
+						width="70"
 						click="onEnterClick(event);"
 						/>
 				</mx:Canvas>
@@ -224,6 +213,8 @@
 			private function onCreationComplete(event:Event):void
 			{
 				currentState = COMMON_STATE;
+				
+				enterButton.selectedField
 			}
 			
 			private function onMinimizeClick(event:Event):void

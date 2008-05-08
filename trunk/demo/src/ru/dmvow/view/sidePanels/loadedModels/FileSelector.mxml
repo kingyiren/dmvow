@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox 
+<mx:VBox 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	creationComplete="onCreationComplete(event)"
 	>
@@ -11,6 +11,9 @@
 		<![CDATA[
 			public static const LOCAL:String = "local";
 			public static const NET:String = "net";
+			
+			private static const MODEL_300_RULES_PATH:String = "data/ssas-dump-size2.txt";
+			private static const MODEL_1700_RULES_PATH:String = "data/ssas-dump.txt";
 		
 			public function get localPath():String
 			{
@@ -19,7 +22,7 @@
 		
 			private function onCreationComplete(event:Event):void
 			{
-				if (Security.sandboxType == Security.LOCAL_TRUSTED || 
+				/*if (Security.sandboxType == Security.LOCAL_TRUSTED || 
 					Security.sandboxType == Security.LOCAL_WITH_FILE)
 				{
 					currentState = LOCAL;
@@ -27,7 +30,7 @@
 				else
 				{
 					currentState = NET;
-				}
+				}*/
 			}
 			
 			private function onLoadButtonClick(event:Event):void
@@ -43,25 +46,18 @@
 			}
 		]]>
 	</mx:Script>
-	<mx:states>
-		<mx:State name="{LOCAL}">
-			<mx:AddChild>
-				<mx:Label text="From local file:"/>
-			</mx:AddChild>
-			<mx:AddChild>
-				<mx:TextInput width="100%" id="textInput" text="data\ssas-dump-size2.txt"/>
-			</mx:AddChild>
-			<mx:AddChild>
-				<mx:Button id="loadButton" label="Load" click="onLoadButtonClick(event)"/>
-			</mx:AddChild>
-		</mx:State>
-		<mx:State name="{NET}">
-			<mx:AddChild>
-				<mx:Label text="From local file:"/>
-			</mx:AddChild>
-			<mx:AddChild>
-				<mx:Button id="browseButton" label="Browse" click="onBrowseButtonClick(event)"/>
-			</mx:AddChild>
-		</mx:State>
-	</mx:states>
-</mx:HBox>
+	<mx:HBox>
+		<mx:Label text="From path:" paddingLeft="20"/>
+		<mx:TextInput width="215" id="textInput" text="{MODEL_300_RULES_PATH}"/>
+		<mx:Button id="loadButton" label="Load" click="onLoadButtonClick(event)"/>
+	</mx:HBox>
+	<mx:HBox paddingLeft="{textInput.x}">
+		<mx:LinkButton label="300 rules URL" click="{textInput.text = MODEL_300_RULES_PATH}" fontSize="10" fontWeight="normal" height="18"/>
+		<mx:LinkButton label="1700 rules URL" click="{textInput.text = MODEL_1700_RULES_PATH}" fontSize="10" fontWeight="normal" height="18"/>
+	</mx:HBox>
+	<mx:HRule width="100%"/>
+	<mx:HBox>
+		<mx:Label text="From local file:"/>
+		<mx:Button id="browseButton" label="Browse" click="onBrowseButtonClick(event)"/>
+	</mx:HBox>
+</mx:VBox>

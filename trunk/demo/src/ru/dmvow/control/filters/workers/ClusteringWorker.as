@@ -22,6 +22,11 @@ public class ClusteringWorker extends AbstractWorker
 	private var distCache:Dictionary = new Dictionary(false);
 	private var topCluster:Cluster;
 	
+	private var nextLevelClusters:Array = new Array();
+	private var currLevelClustersLeft:Array;
+	private var currLevelClusters:Array = new Array();
+	private var currLevel:Number = 0;
+		
 	public function ClusteringWorker(dataModel:DataModel)
 	{
 		_lastInstance = this;
@@ -47,34 +52,140 @@ public class ClusteringWorker extends AbstractWorker
 	
 	public function clusterEntered(value:Cluster):void
 	{
+		iData = previousStepData.clone();
 		iData.dataModel.modelRules.source = value.rulesChildren;
 		iData.dataModel.modelRules.refresh();
 		
-		paused = false;
+		//paused = false;
 		
-		dmvowModel.currentState = DMVoWModel.COMMON_STATE;
+		dmvowModel.currentState = DMVoWModel.CLUSTER_PREVIEW_STATE;
+		
+		reportComplete();
+	}
+	
+	
+	public function clusterFinalEntered():void
+	{
+		paused = false;
 	}
 	
 	override protected function commonProcessActions():void
 	{
 		iData = previousStepData.clone();
 
-		maxCounter = 1;
+		if (filterItem.measure == ClusterFilterItem.SENSE_MEASURE)
+			checkSupportTree();
+		
+		var tCluster1:Cluster;
+		var tCluster2:Cluster;
+		var i:Number;
+		var j:Number;
+		var rules:Array = iData.dataModel.modelRules.source;
+		var rule:IRule;
+		for (i = 0; i < rules.length; i++)
+		{
+			rule = IRule(rules[i]);
+			tCluster1 = new Cluster(rule);
+			workOnProperties(tCluster1);
+			currLevelClusters.push(tCluster1); 
+		}
+		
+		maxCounter = currLevelClusters.length;
 	}
 	
 	override protected function processIteration():void
 	{
+		var tCluster1:Cluster;
+		var tCluster2:Cluster;
+		var i:Number;
+		var j:Number;
+		var rules:Array = iData.dataModel.modelRules.source;
+		var rule:IRule;
 		
-		// Do all the work here
-		checkSupportTree();
+		if (counter == maxCounter - currLevelClusters.length && currLevelClusters.length > 1)
+		{
+			currLevelClustersLeft = currLevelClusters.concat();
+			while (currLevelClustersLeft.length > 0)
+			{
+				tCluster1 = currLevelClustersLeft.pop();
+				
+				// найти наиболее близкий из 3го массива
+				var minDist:Number = Number.MAX_VALUE;
+				var minCluster:Cluster = null;
+				for (i = 0; i < currLevelClusters.length; i++)
+				{
+					tCluster2 = Cluster(currLevelClusters[i]);
+					if (tCluster1 == tCluster2)
+						continue;
+						
+					var dist:Number = clustersDistance(tCluster1, tCluster2);
+					if (dist < minDist)
+					{
+						minDist = dist;
+						minCluster = tCluster2;
+					}
+				}
+				
+				// проверим, может какой-то кластер уже содержит найденый элемент
+				var found:Boolean = false;
+				var parentCluster:Cluster;
+				var tCluster3:Cluster;
+				for (i = 0; i < nextLevelClusters.length; i++)
+				{
+					tCluster3 = nextLevelClusters[i];
+					if (tCluster3.hasChild(minCluster))
+					{
+						found = true;
+						parentCluster = tCluster3;
+						break;
+					}
+					else if (tCluster3.hasChild(tCluster1))
+					{
+						found = true;
+						parentCluster = tCluster3;
+						break;
+					}
+				}
+				
+				if (found)
+				{
+					if (!parentCluster.hasChild(tCluster1))
+						parentCluster.addChild(tCluster1);
+					else if (!parentCluster.hasChild(minCluster))
+						parentCluster.addChild(minCluster);
+				}
+				else
+				{
+					parentCluster = new Cluster();
+					parentCluster.addChild(tCluster1);
+					parentCluster.addChild(minCluster);
+					nextLevelClusters.push(parentCluster);
+				}
+			}
+			
+			// Вычислим для новых кластеров 
+			// высоты и сохраним как текущий уровень
+			for (i = 0; i < nextLevelClusters.length; i++)
+			{
+				tCluster1 = Cluster(nextLevelClusters[i]);
+				tCluster1.level = currLevel;
+				workOnProperties(tCluster1);
+			}
+			
+			currLevel++;
+			currLevelClusters = nextLevelClusters;
+			nextLevelClusters = new Array();
+		}
 		
-		buildClusterTree();
+		if (counter == maxCounter - 1)
+		{
+			paused = true;
+			
+			topCluster = Cluster(currLevelClusters[0]);
 		
-		// Pause the process to wait for user's cluster choise.
-		paused = true;
-		
-		dmvowModel.cluster = topCluster;
-		dmvowModel.currentState = DMVoWModel.CLUSTER_STATE;
+			dmvowModel.cluster = topCluster;
+			dmvowModel.currentState = DMVoWModel.CLUSTER_STATE;
+		}
 	}  
 	
 	override protected function reportComplete():void
@@ -86,6 +197,11 @@ public class ClusteringWorker extends AbstractWorker
 		filterItem.data = iData;
 		
 		super.reportComplete();
+	}
+	
+	override protected function get iterationsPerFrame():Number
+	{
+		return 2;
 	}
 	
 	/**
@@ -162,25 +278,13 @@ public class ClusteringWorker extends AbstractWorker
 	 */	
 	private function buildClusterTree():void
 	{
-		var nextLevelClusters:Array = new Array();
-		var currLevelClustersLeft:Array;
-		var currLevelClusters:Array = new Array();
-		var currLevel:Number = 0;
-		
 		// 0
 		var tCluster1:Cluster;
 		var tCluster2:Cluster;
 		var i:Number;
 		var j:Number;
-		var rules:Array = dataModel.data.dataModel.modelRules.source;
+		var rules:Array = iData.dataModel.modelRules.source;
 		var rule:IRule;
-		for (i = 0; i < rules.length; i++)
-		{
-			rule = IRule(rules[i]);
-			tCluster1 = new Cluster(rule);
-			workOnProperties(tCluster1);
-			currLevelClusters.push(tCluster1); 
-		}
 		
 		do
 		{
@@ -397,8 +501,68 @@ public class ClusteringWorker extends AbstractWorker
 				return Number(distCache[rule1][rule2]); 
 		
 		// If we are here, cache didn't work.
-		var temp:Number = ruleConcatenationSupport(rule1, rule2);
-		var result:Number = 1 - temp/(rule1.ruleSupport + rule2.ruleSupport - temp);
+		var result:Number;
+		
+		if (filterItem.measure == ClusterFilterItem.SENSE_MEASURE)
+		{
+			var temp:Number = ruleConcatenationSupport(rule1, rule2);
+			result = 1 - temp/(rule1.ruleSupport + rule2.ruleSupport - temp);
+		}
+		else if (filterItem.measure == ClusterFilterItem.ITEMS_MEASURE)
+		{
+			var i:Number;
+			var j:Number;
+			var p:String;
+			var item:IItem;
+			var rule1Obj:Object = new Object();
+			var rule2Obj:Object = new Object();
+			var r1a:Array = rule1.ruleAntecedent.itemsetItems.source;
+			var r1c:Array = rule1.ruleConsequent.itemsetItems.source;
+			var r2a:Array = rule2.ruleAntecedent.itemsetItems.source;
+			var r2c:Array = rule2.ruleConsequent.itemsetItems.source;
+			for (i = 0; i < r1a.length; i++)
+			{
+				item = IItem(r1a[i]);
+				rule1Obj[item.itemName] = true;
+			}
+			for (i = 0; i < r1c.length; i++)
+			{
+				item = IItem(r1c[i]);
+				rule1Obj[item.itemName] = true;
+			}
+			for (i = 0; i < r2a.length; i++)
+			{
+				item = IItem(r2a[i]);
+				rule2Obj[item.itemName] = true;
+			}
+			for (i = 0; i < r2c.length; i++)
+			{
+				item = IItem(r2c[i]);
+				rule2Obj[item.itemName] = true;
+			}
+			
+			var rulesConcat:Object = new Object();
+			var rulesConcatLength:Number = 0;
+			for (p in rule1Obj)
+				rulesConcat[p] = true;
+			for (p in rule2Obj)
+				rulesConcat[p] = true;
+			for (p in rulesConcat)
+				rulesConcatLength++;
+			
+			var rulesIntersect:Object = new Object();
+			var rulesIntersectLength:Number = 0;
+			for (p in rule1Obj)
+				rulesIntersect[p] = 1;
+			for (p in rule2Obj)
+				if (rulesIntersect[p] == 1)
+					rulesIntersect[p] = 2;
+			for (p in rulesIntersect)
+				if (rulesIntersect[p] == 2)
+					rulesIntersectLength++;
+			
+			result = 1 - rulesIntersectLength / rulesConcatLength;
+		}
 		
 		if (result < 0 || result > 1)
 			trace(ruleConcatenationSupport(rule1, rule2));

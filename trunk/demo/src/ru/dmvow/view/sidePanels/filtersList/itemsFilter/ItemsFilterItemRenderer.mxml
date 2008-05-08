@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox 
+<mx:Canvas 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	creationComplete="onCreationComplete(event)" 
-	xmlns:itemsFilter="ru.dmvow.view.sidePanels.filtersList.itemsFilter.*">
+	xmlns:itemsFilter="ru.dmvow.view.sidePanels.filtersList.itemsFilter.*"
+	width="100%"
+	height="100%"
+	>
 	<itemsFilter:MustHaveToggle id="mustHaveToggle"/>
-	<mx:Label text="{itemPattern.itemName}"/>
+	<mx:Label left="18" text="{itemPattern.itemName}"/>
+	<mx:Label text="~" selectable="false" color="0x888888" horizontalCenter="0"/>
+	<mx:ComboBox y="0" width="125" height="18" id="valueComboBox" change="onValueComboBoxChange(event);" right="2"/>
 	<mx:Script>
 		<![CDATA[
 			import mx.binding.utils.ChangeWatcher;
@@ -26,6 +31,15 @@
 				{
 					mustHaveToggle.mustHave = _itemPattern.mustHave;
 					
+					valueComboBox.dataProvider = itemPattern.availableValues;
+					if (value.itemValue)
+					{
+						var index:Number = itemPattern.availableValues.indexOf(value.itemValue);
+						valueComboBox.selectedIndex = index;
+					}
+					else
+						valueComboBox.selectedIndex = 0;
+					
 					watcher = BindingUtils.bindProperty(itemPattern, "mustHave", mustHaveToggle, "mustHave");
 				}
 			}
@@ -39,6 +53,14 @@
 			{
 				BindingUtils.bindProperty(this, "itemPattern", this, "data");
 			}
+			
+			private function onValueComboBoxChange(event:Event):void
+			{
+				if (valueComboBox.selectedIndex == 0)
+					itemPattern.itemValue = null;
+				else
+					itemPattern.itemValue = valueComboBox.selectedLabel;
+			}
 		]]>
 	</mx:Script>
-</mx:HBox>
+</mx:Canvas>

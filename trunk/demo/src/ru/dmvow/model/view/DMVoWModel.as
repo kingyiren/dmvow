@@ -9,6 +9,7 @@ public class DMVoWModel
 {
 	public static const COMMON_STATE:String = "commonState";
 	public static const CLUSTER_STATE:String = "clusterState";
+	public static const CLUSTER_PREVIEW_STATE:String = "clusterPreviewState";
 	
 	[Bindable]
 	public var currentState:String = COMMON_STATE;
