@@ -118,10 +118,15 @@
 				
 				if (!upToDate)
 				{
-					if (preBuildDataNet.data.dataModel.modelRules.length > MAX_IMMEDIATE_RULES_TO_SHOW)
+					var rulesNum:Number = preBuildDataNet.data.dataModel.modelRules.length;
+					if (rulesNum > MAX_IMMEDIATE_RULES_TO_SHOW)
 					{
 						currentState = ASK_STATE;
 						//askButton.label = 'Show ' + preBuildDataNet.data.dataModel.modelRules.length + ' rules';
+					}
+					else if (rulesNum == 0)
+					{
+						currentState = EMPTY_STATE;
 					}
 					else
 					{
@@ -261,6 +266,9 @@
 				
 				container.scaleX += scaleDelta;
 				container.scaleY += scaleDelta;
+				
+				if (container.scaleX > 1)
+					container.scaleX = container.scaleY = 1
 			}
 			
 			protected function onShowAllClick(event:Event):void

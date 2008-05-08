@@ -61,6 +61,7 @@
 	</mx:Panel>
 	<mx:Script>
 		<![CDATA[
+			import ru.dmvow.model.view.DMVoWModel;
 			import mx.collections.HierarchicalData;
 			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
 			import ru.dmvow.control.filters.workers.ClusteringWorker;

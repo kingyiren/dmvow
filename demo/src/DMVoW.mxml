@@ -21,6 +21,8 @@
 
 	<mx:Script>
 		<![CDATA[
+			import ru.dmvow.control.filters.workers.ClusteringWorker;
+			import ru.dmvow.model.view.processingList.items.ProcessingListItem;
 			import ru.dmvow.events.global.GlobalEvent;
 			private static var _instance:DMVoW;
 			
@@ -41,16 +43,30 @@
 	<mx:states>
 		<mx:State name="{DMVoWModel.COMMON_STATE}">
 			<mx:AddChild>
-				<mx:HDividedBox paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" width="100%" height="100%">
-					<mx:VBox width="40%" paddingLeft="5" paddingRight="5" height="100%">
-						<!-- Содержимое левой колонки -->
-						<loadedModels:LoadedModels id="loadedModels" width="100%" models="{model.models}"/>
-						<interestingMeasures:InterestingMeasures id="interestingMeasures" width="100%" interestingMeasures="{model.interestingMeasures}"/>
-						<filtersList:FiltersList id="filtersList" width="100%" model="{model.selectedModel}" dmvowModel="{model}" visible="{model.selectedModel != null}" />
-					</mx:VBox>
+				<mx:HDividedBox id="commonStateMainChild" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" width="100%" height="100%">
+					<mx:Canvas id="leftCanvas" width="40%" height="100%">
+						<mx:VBox id="leftVBox" width="100%" paddingLeft="5" paddingRight="5" height="100%">
+							<!-- Содержимое левой колонки -->
+							<loadedModels:LoadedModels id="loadedModels" width="100%" models="{model.models}"/>
+							<interestingMeasures:InterestingMeasures id="interestingMeasures" width="100%" interestingMeasures="{model.interestingMeasures}"/>
+							<filtersList:FiltersList id="filtersList" width="100%" model="{model.selectedModel}" dmvowModel="{model}" visible="{model.selectedModel != null}" />
+						</mx:VBox>
+					</mx:Canvas>
 					<field:DataModelView id="dataModelView" model="{model.selectedModel.processingList.selectedItem.data}"/>
 				</mx:HDividedBox>
 			</mx:AddChild>
+		</mx:State>
+		<mx:State name="{DMVoWModel.CLUSTER_PREVIEW_STATE}" basedOn="{DMVoWModel.COMMON_STATE}">
+			<mx:AddChild relativeTo="{leftCanvas}">
+				<mx:Panel title="Controls" width="100%" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+					<mx:Text width="100%">
+						<mx:text>Here you can make the next action - check another cluster or finish the clusters overview and proceed with this one.</mx:text>
+					</mx:Text>
+					<mx:Button label="Go back to clusters" icon="{InProcess}" click="model.currentState = DMVoWModel.CLUSTER_STATE;"/>
+					<mx:Button label="Save this cluster" icon="{Valid}" click="ClusteringWorker.lastInstance.clusterFinalEntered(); model.currentState = DMVoWModel.COMMON_STATE;"/>
+				</mx:Panel>
+			</mx:AddChild>
+			<mx:SetProperty target="{leftVBox}" name="visible" value="{false}"/>
 		</mx:State>
 		<mx:State name="{DMVoWModel.CLUSTER_STATE}">
 			<mx:AddChild>

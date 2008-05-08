@@ -17,6 +17,7 @@
 	</mx:Metadata>
 	<mx:Script>
 		<![CDATA[
+			import ru.dmvow.view.sidePanels.filtersList.clusteringFilter.EditClusteringFilter;
 			import ru.dmvow.model.view.processingList.items.clusterFilter.ClusterFilterItem;
 			import ru.dmvow.model.view.DMVoWModel;
 			import ru.dmvow.view.sidePanels.filtersList.interestingMeasureFilter.EditInterestingMeasureFilter;
@@ -33,6 +34,7 @@
 			private var _dmvowModel:DMVoWModel;
 			private var editItemsFilter:EditItemsFilter = new EditItemsFilter();
 			private var editInterestingMeasureFilter:EditInterestingMeasureFilter = new EditInterestingMeasureFilter();
+			private var editClusteringFilter:EditClusteringFilter = new EditClusteringFilter();
 			private var editFilterIndex:Number; 
 			
 			[Bindable]
@@ -81,6 +83,16 @@
 				PopUpManager.centerPopUp(editInterestingMeasureFilter);
 			}
 			
+			private function showClusteringFilter(item:ClusterFilterItem = null):void
+			{
+				editClusteringFilter.newFilter = (item == null);
+				if (item)
+					editClusteringFilter.clusterFilterItem = item;
+				
+				PopUpManager.addPopUp(editClusteringFilter, DMVoW.instance, true);
+				PopUpManager.centerPopUp(editClusteringFilter);
+			}
+			
 			private function onCreationComplete(event:Event):void
 			{
 				list.itemRenderer = new ClassFactory(FiltersListRenderer);
@@ -91,10 +103,12 @@
 				editInterestingMeasureFilter.addEventListener(EditFilterEvent.SAVE, onEditInterestingMeasureFilterSave, false, 0, true);
 				editInterestingMeasureFilter.addEventListener(EditFilterEvent.CANCEL, onEditInterestingMeasureFilterCancel, false, 0, true);
 				
+				editClusteringFilter.addEventListener(EditFilterEvent.SAVE, onEditClusteringFilterSave, false, 0, true);
+				editClusteringFilter.addEventListener(EditFilterEvent.CANCEL, onEditClusteringFilterCancel, false, 0, true);
+				
 				// Events, that are bubbled from the list items
 				addEventListener(FiltersListItemEvent.REMOVE, onItemRemove, false, 0, true);
 				addEventListener(FiltersListItemEvent.EDIT, onItemEdit, false, 0, true);
-				addEventListener(FiltersListItemEvent.SHOW, onItemShow, false, 0, true);
 			}
 			
 			private function onAddItemsFilter(event:Event):void
@@ -109,7 +123,7 @@
 			
 			private function onAddClustering(event:Event):void
 			{
-				model.processingList.addItem(new ClusterFilterItem());
+				showClusteringFilter();
 			}
 			
 			private function onEditItemsFilterSave(event:EditFilterEvent):void
@@ -124,8 +138,8 @@
 			{
 				PopUpManager.removePopUp(editItemsFilter);
 				
-				if (!editItemsFilter.newFilter)
-					model.processingList.removeItemAt(model.processingList.length - 1);
+				//if (!editItemsFilter.newFilter)
+				//	model.processingList.removeItemAt(model.processingList.length - 1);
 			}
 
 			private function onEditInterestingMeasureFilterSave(event:EditFilterEvent):void
@@ -140,8 +154,24 @@
 			{
 				PopUpManager.removePopUp(editInterestingMeasureFilter);
 				
-				if (!editInterestingMeasureFilter.newFilter)
-					model.processingList.removeItemAt(model.processingList.length - 1);
+				//if (!editInterestingMeasureFilter.newFilter)
+				//	model.processingList.removeItemAt(model.processingList.length - 1);
+			}
+
+			private function onEditClusteringFilterSave(event:EditFilterEvent):void
+			{
+				PopUpManager.removePopUp(editClusteringFilter);
+				
+				if (editClusteringFilter.newFilter)
+					model.processingList.addItem(editClusteringFilter.clusterFilterItem);
+			}
+			
+			private function onEditClusteringFilterCancel(event:EditFilterEvent):void
+			{
+				PopUpManager.removePopUp(editClusteringFilter);
+				
+				//if (!editClusteringFilter.newFilter)
+				//	model.processingList.removeItemAt(model.processingList.length - 1);
 			}
 			
 			private function onItemRemove(event:FiltersListItemEvent):void
@@ -157,17 +187,14 @@
 			{
 				if (event.item is ItemsFilterItem)
 					showEditItemsFilter(event.item as ItemsFilterItem);
-				if (event.item is InterestingMeasureFilterItem)
+				else if (event.item is InterestingMeasureFilterItem)
 					showInterestingMeasureFilter(event.item as InterestingMeasureFilterItem);
+				else if (event.item is ClusterFilterItem)
+					showClusteringFilter(event.item as ClusterFilterItem);
 				else
 					throw new Error("Unknown list item to edit.");
 				
 				event.stopImmediatePropagation();
-			}
-			
-			private function onItemShow(event:FiltersListItemEvent):void
-			{
-				//  FiltersListController will catch this
 			}
 		]]>
 	</mx:Script>
@@ -186,7 +213,7 @@
 	<filtersList:FiltersListProgress
 		id="listProgress" 
 		width="100%" 
-		height="200"
+		height="150"
 		visible="{model.processingList.working}" 
 		progress="{model.processingList.progress}" 
 		/>

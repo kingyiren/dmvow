@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:List xmlns:mx="http://www.adobe.com/2006/mxml">
+<mx:List 
+	xmlns:mx="http://www.adobe.com/2006/mxml">
 	<mx:Script>
 		<![CDATA[
 			import mx.managers.DragManager;
@@ -35,7 +36,7 @@
 				var data:Array = event.dragSource.dataForFormat("items") as Array;
 				var allow:Boolean = true;
 				
-				for (var i:Number = 0; i < data.length; i++)
+				/*for (var i:Number = 0; i < data.length; i++)
 				{
 					if (data[i] is String)
 					{
@@ -55,7 +56,7 @@
 							break;
 						}
 					}
-				}
+				}*/
 				
 				if (allow)
 				{

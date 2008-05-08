@@ -158,6 +158,8 @@ public class FiltersListController extends EventDispatcher
 		}
 		else
 		{
+			workersListIndex--;
+			
 			_model.processingList.working = false;
 			
 			showItem((workersList[workersList.length - 1] as WorkersListItem).processingListItem);
@@ -263,6 +265,9 @@ public class FiltersListController extends EventDispatcher
 					workersListItem.worker.addEventListener(ProgressEvent.PROGRESS, onWorkerProgress, false, 0, true);
 					workersListItem.worker.addEventListener(Event.COMPLETE, onWorkerComplete, false, 0, true);
 					workersList.push(workersListItem);
+					
+					if (event.item == processingListItem)
+						break;
 				}
 			}
 			// Start the first worker
@@ -273,7 +278,7 @@ public class FiltersListController extends EventDispatcher
 	
 	private function onWorkerProgress(event:ProgressEvent):void
 	{
-		var progress:Number = (event.bytesLoaded / event.bytesTotal) * (workersListIndex / workersList.length);
+		var progress:Number = (event.bytesLoaded / event.bytesTotal) * ((workersListIndex + 1) / workersList.length);
 		
 		setProgress(progress);
 	}

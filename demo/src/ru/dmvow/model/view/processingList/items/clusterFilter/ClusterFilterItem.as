@@ -4,11 +4,29 @@ import ru.dmvow.model.view.processingList.items.ProcessingListItem;
 
 public class ClusterFilterItem extends ProcessingListItem
 {
+	public static const SENSE_MEASURE:String = "Sense measure";
+	public static const ITEMS_MEASURE:String = "Items measure";
+	
+	private var _measure:String = SENSE_MEASURE;
+	
 	public function ClusterFilterItem()
 	{
 		super();
 		
 		status = NEVER_PROCESSED;
+		
+		update();
+	}
+	
+	[Bindable]
+	public function get measure():String
+	{
+		return _measure;
+	}
+	
+	public function set measure(value:String):void
+	{
+		_measure = value;
 		
 		update();
 	}
@@ -20,7 +38,7 @@ public class ClusterFilterItem extends ProcessingListItem
 	
 	override public function get editable():Boolean
 	{
-		return false;
+		return true;
 	}
 	
 	override public function get removable():Boolean
@@ -35,7 +53,7 @@ public class ClusterFilterItem extends ProcessingListItem
 	
 	private function update():void
 	{
-		name = "Clustering " + (data ? "(" + data.dataModel.modelRules.length + ")" : "");
+		name = "Clustering using " + measure;
 		
 		updateDescription();
 	}

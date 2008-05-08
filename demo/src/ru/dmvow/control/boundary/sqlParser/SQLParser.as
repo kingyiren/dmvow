@@ -17,7 +17,9 @@ package ru.dmvow.control.boundary.sqlParser
 		protected const NODE_RULE_INDEX:Number = 12;
 		protected const NODE_PROBABILITY_INDEX:Number = 14;
 		protected const NODE_SUPPORT_INDEX:Number = 17;
-		protected const LINE_SEPARATOR:String = "\r\n";
+		protected const LINE_SEPARATOR_1:String = "\r\n";
+		protected const LINE_SEPARATOR_2:String = "\n\r";
+		protected const LINE_SEPARATOR_3:String = "\n";
 		protected const TAB_SEPARATOR:String = "\t";
 		
 		protected var currentData:String;
@@ -46,7 +48,11 @@ package ru.dmvow.control.boundary.sqlParser
 			var j:Number;
 			var k:Number;
 			
-			rows = currentData.split(LINE_SEPARATOR);
+			rows = currentData.split(LINE_SEPARATOR_1);
+			if (rows.length < 2)
+				rows = currentData.split(LINE_SEPARATOR_2);
+			if (rows.length < 2)
+				rows = currentData.split(LINE_SEPARATOR_3);
 			rows.shift();
 			
 			for (i = 0; i < rows.length; i++)
