@@ -1,0 +1,17 @@
+#summary A simple method to retrieve the association model from SSAS
+#labels Featured
+
+= Introduction =
+
+I've searched a lot for a way to get my model as a text file from the SSAS, but found the only way. Here it is.
+
+
+= Details =
+
+ # Launch *Microsoft SQL Management Studio*
+ # Connect to your server
+ # Create new *DMX* Query `SELECT * FROM [Process Events].CONTENT`
+ # Execute the query on your mining model
+ # Copy all the table with results with Ctrl + C
+ # Open Notepad and paste it with Ctrl + V
+ # Save the file and use it in DMVoW
